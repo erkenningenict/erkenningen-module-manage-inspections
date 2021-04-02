@@ -12,5 +12,3 @@ generates:
       skipTypeNameForRoot: true
       preResolveTypes: true
       defaultMapper: DeepPartial<{T}>
-      scalars:
-        ID: number

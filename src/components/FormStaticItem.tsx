@@ -6,7 +6,7 @@ export const FormStaticItem: React.FC<{
   fieldClassNames?: string;
 }> = (props) => {
   return (
-    <div {...props} className={'form-group'} style={{ marginBottom: '0' }}>
+    <div className={'form-group'} style={{ marginBottom: '0' }}>
       <label className={`${props.labelClassNames || 'col-sm-4'} control-label`}>
         {props.label}
       </label>

@@ -112,7 +112,7 @@ const DiscussionDetails: React.FC<{
                       formControlClassName={'col-sm-8 col-sm-offset-3'}
                     >
                       <Button
-                        label={'Opslaan'}
+                        label={'Commentaar opslaan'}
                         icon="pi pi-check"
                         buttonType="submit"
                         loading={addCommentLoading}

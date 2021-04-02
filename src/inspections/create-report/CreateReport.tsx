@@ -1,8 +1,12 @@
 import React from 'react';
 import { Panel } from '@erkenningen/ui/layout/panel';
 import {
+  GetVisitationDocument,
+  GetVisitationQuery,
   useUpdateVisitationReportMutation,
+  VisitatieBeoordelingCategorie,
   VisitatieBeoordelingCategorieFieldsFragment,
+  VisitatieBeoordelingCategorieVraag,
   VisitatieStatusEnum,
 } from '../../generated/graphql';
 // import Form, { FormikSchema } from '../../components/Form';
@@ -13,12 +17,15 @@ import Category from './Category';
 import { FieldArray, Form, Formik } from 'formik';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { Spinner } from '@erkenningen/ui/components/spinner';
+import { convertTextQuestionsToReport } from '../../utils/strings';
+import { getScores } from '../../utils/scoring';
+import { getRatingsTemplate } from '../../utils/ratings-template';
 
 export type IInspectionReport = {
   textQuestions: ITextQuestionTemplate[];
   textQuestionsVersion: string;
   textQuestionsDate: Date;
-  ratings: ICategory[];
+  ratings: VisitatieBeoordelingCategorie[];
   ratingsVersion: string;
   ratingsDate: Date;
 };
@@ -29,34 +36,7 @@ export type ITextQuestionTemplate = {
   validation: string;
 };
 
-export type ICategory = {
-  id?: string;
-  categoryName: string;
-  weighing: number;
-  rating: number; // cijfer
-  total: number; // totaal
-  questions: IRatingQuestion[];
-  version: string;
-  date: Date;
-};
-
-// export type ICategory = ICategoryTemplate & {};
-
-// export type IRatingQuestion = IRatingQuestionTemplate & {};
-
-export type IRatingQuestion = {
-  id?: string;
-  categoryId?: string;
-  name: string;
-  weighing: number;
-  rating: number;
-  total: number;
-  version: string;
-  date: Date;
-  remark?: string;
-};
-
-type IQuestionType = {
+export type IQuestionType = {
   [key: string]: string;
 };
 type IQuestionValidationType = {
@@ -83,13 +63,18 @@ const CreateReport: React.FC<{
 
   let meta: IMeta = { version: 'onbekend' };
   let textQuestionsTemplate: ITextQuestionTemplate[] = [];
-  let ratingsTemplate: ICategory[] = [];
+  let ratingsTemplate: VisitatieBeoordelingCategorie[] = [];
   if (props.rapportTemplateJson && props?.rapportTemplateJson.length > 0) {
     const jsonTemplate = JSON.parse(props.rapportTemplateJson);
     meta = jsonTemplate.meta;
     textQuestionsTemplate = jsonTemplate.textQuestionsTemplate;
-    ratingsTemplate = jsonTemplate.ratingsTemplate;
+    ratingsTemplate =
+      props.categories === undefined || props.categories?.length === 0
+        ? getRatingsTemplate(props.visitatieId)
+        : props.categories || getRatingsTemplate(props.visitatieId);
+    // ratingsTemplate = getRatingsTemplate(props.visitatieId);
   }
+  console.log('#DH# ratingstemplate', props.categories);
 
   const [
     updateVisitationReport,
@@ -110,32 +95,34 @@ const CreateReport: React.FC<{
         detail: `Er is een fout opgetreden bij het bijwerken van het rapport: ${e.message}`,
       });
     },
-    // update(cache, result) {
-    //   const discussieVisitatie = result?.data?.addVisitationComment;
-    //   if (!discussieVisitatie) {
-    //     return;
-    //   }
-    //   const visitationData = cache.readQuery<GetVisitationQuery>({
-    //     query: GetVisitationDocument,
-    //     variables: { input: { visitatieId: props.visitatieId } },
-    //   });
+    update(cache, result) {
+      console.log('#DH# update', result);
+      const updateVisitationReport = result?.data?.updateVisitationReport;
+      if (!updateVisitationReport) {
+        return;
+      }
+      const visitationData = cache.readQuery<GetVisitationQuery>({
+        query: GetVisitationDocument,
+        variables: { input: { visitatieId: props.visitatieId } },
+      });
 
-    //   const newVisitationData = visitationData?.Visitation;
+      const currentVisitationData = visitationData?.Visitation;
 
-    //   if (!newVisitationData) {
-    //     return;
-    //   }
-    //   cache.writeQuery<GetVisitationQuery>({
-    //     query: GetVisitationDocument,
-    //     variables: { input: { visitatieId: props.visitatieId } },
-    //     data: {
-    //       Visitation: {
-    //         ...(newVisitationData.DiscussieVisitaties?.concat(discussieVisitatie) as any),
-    //         __typename: 'Visitatie',
-    //       },
-    //     },
-    //   });
-    // },
+      if (!currentVisitationData) {
+        return;
+      }
+      cache.writeQuery<GetVisitationQuery>({
+        query: GetVisitationDocument,
+        variables: { input: { visitatieId: props.visitatieId } },
+        data: {
+          Visitation: {
+            ...currentVisitationData,
+            ...updateVisitationReport,
+            __typename: 'Visitatie',
+          },
+        },
+      });
+    },
   });
 
   // [
@@ -249,7 +236,7 @@ const CreateReport: React.FC<{
     //   }),
     // ),
   });
-  const numberRatings: ICategory[] = [...ratingsTemplate];
+  const numberRatings: VisitatieBeoordelingCategorie[] = [...ratingsTemplate];
 
   console.log('#DH# numberRatings', numberRatings);
   const initialValues = {
@@ -280,14 +267,20 @@ const CreateReport: React.FC<{
           validationSchema={schemaNormal}
           onSubmit={async (values: any) => {
             console.log('#DH# save values', values);
+            const report = convertTextQuestionsToReport(values.textQuestions);
 
+            const scorings = getScores(values.ratings);
+            console.log('#DH# report val', report);
             await updateVisitationReport({
               variables: {
                 input: {
-                  visitatieId: props.visitatieId,
-                  ratings: '',
-                  status: VisitatieStatusEnum.RapportWordtOpgesteld,
-                  textQuestions: JSON.stringify(values.textQuestions),
+                  VisitatieID: props.visitatieId,
+                  Status: VisitatieStatusEnum.RapportWordtOpgesteld,
+                  VragenJson: JSON.stringify(values.textQuestions),
+                  Rapport: report,
+                  Rapportcijfer: scorings?.RapportCijfer || 0,
+                  VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
+                  DatumRapport: new Date(),
                 },
               },
             });
@@ -322,21 +315,19 @@ const CreateReport: React.FC<{
                 <div className="form-group">
                   <label className="control-label col-sm-4"></label>
                   <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">Waardering</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">
-                    Totaal categorie
-                  </div>
+                  <div className="col-sm-1 form-control-static text-bold textRight">Cijfer</div>
+                  <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
                   <div className="col-sm-1 form-control-static text-bold textRight">
                     Toelichting
                   </div>
                 </div>
-                {/* {console.log('Formik Values: ', formik.values)} */}
+                {console.log('Formik Values: ', formik.values)}
                 <FieldArray name="numberRatings">
                   {() => (
                     <div>
-                      {formik.values?.ratings?.map((cat, index) => (
+                      {formik.values?.ratings?.map((cat: VisitatieBeoordelingCategorie, index) => (
                         <Category
-                          key={index}
+                          key={cat.CategorieTemplateID}
                           subform={formik}
                           category={cat}
                           index={index}
@@ -350,7 +341,7 @@ const CreateReport: React.FC<{
                   labelClassNames={'col-sm-4'}
                   formControlClassName={'col-sm-8 col-sm-offset-4'}
                 >
-                  <Button label={'Opslaan'} buttonType="submit" />
+                  <Button label={'Rapport opslaan'} buttonType="submit" icon="pi pi-check" />
                 </FormItem>
               </div>
             </Form>

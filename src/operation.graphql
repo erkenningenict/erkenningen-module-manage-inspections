@@ -68,11 +68,17 @@ query getVisitation($input: visitationInput!) {
 fragment VisitatieBeoordelingCategorieFields on VisitatieBeoordelingCategorie {
   VisitatieBeoordelingCategorieID
   VisitatieID
+  CategorieTemplateID
   CategorieNaam
   Weging
   TotaalPunten
   Cijfer
   Versie
+  VanafDatum
+  DatumAangemaakt
+  AangemaaktDoor
+  DatumGewijzigd
+  GewijzigdDoor
   Vragen {
     ...VisitatieBeoorderlingCategorieVraagFields
   }
@@ -81,14 +87,20 @@ fragment VisitatieBeoordelingCategorieFields on VisitatieBeoordelingCategorie {
 fragment VisitatieBeoorderlingCategorieVraagFields on VisitatieBeoordelingCategorieVraag {
   VisitatieBeoordelingCategorieVraagID
   VisitatieBeoordelingCategorieID
-	Naam
+  CategorieTemplateID
+  VraagTemplateID
+  Naam
   Weging
   TotaalPunten
   Cijfer
   Toelichting
   Versie
+  VanafDatum
+  DatumAangemaakt
+  AangemaaktDoor
+  DatumGewijzigd
+  GewijzigdDoor
 }
-
 
 fragment DiscussieVisitatieFields on DiscussieVisitatie {
   DiscussieVisitatieID
@@ -170,8 +182,11 @@ mutation addVisitationComment($input: addVisitationCommentInput!) {
 mutation updateVisitationReport($input: updateVisitationReportInput!) {
   updateVisitationReport(input: $input) {
     VisitatieID
-   	Rapport
+    Rapport
+    Rapportcijfer
+    DatumRapport
+    VolgensIntentieAanbod
     VragenJson
-    RapportTemplateJson
+    Status
   }
 }

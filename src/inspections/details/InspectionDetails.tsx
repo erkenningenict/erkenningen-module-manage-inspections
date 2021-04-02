@@ -142,6 +142,7 @@ const InspectionDetails: React.FC<unknown> = () => {
                         visitatie?.Rapport?.replace('<p>', '')
                           .replace('</p>', '')
                           .replace(/<BR><BR>/g, '')
+                          .replace(`SLASH`, '/')
                           .replace(
                             /<BR>----------------------------------------------------------/g,
                             '<br/>',
@@ -153,7 +154,7 @@ const InspectionDetails: React.FC<unknown> = () => {
                           )
                           .replace(
                             'Is de doelstelling bereikt: ',
-                            '<p class="question">Is de doelstelling bereikt:</p>',
+                            '<span class="question">Is de doelstelling bereikt: </span>',
                           )
                           .replace(
                             'Aantal deelnemers: ',
@@ -161,27 +162,27 @@ const InspectionDetails: React.FC<unknown> = () => {
                           )
                           .replace(
                             'Docenten/inleiders: ',
-                            '<p class="question">Docenten/inleiders:</p>',
+                            '<span class="question">Docenten/inleiders: </span>',
                           )
                           .replace(
                             'Lokatie in relatie tot doelstelling: ',
-                            '<p class="question">Lokatie in relatie tot doelstelling:</p>',
+                            '<span class="question">Lokatie in relatie tot doelstelling: </span>',
                           )
                           .replace(
                             'Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: ',
-                            '<p class="question">Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld:</p>',
+                            '<span class="question">Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: </span>',
                           )
                           .replace(
                             'Hulpmiddelen en toepassingswijze: ',
-                            '<p class="question">Hulpmiddelen en toepassingswijze:</p>',
+                            '<span class="question">Hulpmiddelen en toepassingswijze: </span>',
                           )
                           .replace(
                             'Kwaliteit van samenvatting: ',
-                            '<p class="question">Aanvullende opmerkingen:</p>',
+                            '<span class="question">Aanvullende opmerkingen: </span>',
                           )
                           .replace(
                             'Aanvullende opmerkingen: ',
-                            '<p class="question">Aanvullende opmerkingen:</p>',
+                            '<span class="question">Aanvullende opmerkingen: </span>',
                           ) || '',
                     }}
                   ></div>
