@@ -433,9 +433,9 @@ export type VisitatieBeoordelingCategorieVraag = {
   Versie: Scalars['String'];
   VanafDatum: Scalars['Date'];
   DatumAangemaakt: Scalars['Date'];
-  AangemaaktDoor: Scalars['String'];
+  AangemaaktDoor?: Maybe<Scalars['String']>;
   DatumGewijzigd: Scalars['Date'];
-  GewijzigdDoor: Scalars['String'];
+  GewijzigdDoor?: Maybe<Scalars['String']>;
 };
 
 export type VisitatieBeoordelingCategorie = {
@@ -450,9 +450,9 @@ export type VisitatieBeoordelingCategorie = {
   Versie: Scalars['String'];
   VanafDatum: Scalars['Date'];
   DatumAangemaakt: Scalars['Date'];
-  AangemaaktDoor: Scalars['String'];
+  AangemaaktDoor?: Maybe<Scalars['String']>;
   DatumGewijzigd: Scalars['Date'];
-  GewijzigdDoor: Scalars['String'];
+  GewijzigdDoor?: Maybe<Scalars['String']>;
   Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraag>>>;
 };
 
@@ -1754,13 +1754,40 @@ export type UpdateVisitationReportInput = {
   /** JSON string with ratings */
   VragenJson: Scalars['SafeString'];
   /** JSON string with ratings */
-  ratings?: Maybe<Scalars['SafeString']>;
+  ratings?: Maybe<Array<VisitatieBeoordelingCategorieInput>>;
   Status: VisitatieStatusEnum;
 };
 
 export type AddVisitationCommentInput = {
   visitatieId: Scalars['Int'];
   commentaar: Scalars['SafeString'];
+};
+
+export type VisitatieBeoordelingCategorieInput = {
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  VisitatieID: Scalars['Int'];
+  CategorieTemplateID: Scalars['Int'];
+  CategorieNaam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+  Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraagInput>>>;
+};
+
+export type VisitatieBeoordelingCategorieVraagInput = {
+  VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  CategorieTemplateID: Scalars['Int'];
+  VraagTemplateID: Scalars['Int'];
+  Naam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Toelichting?: Maybe<Scalars['String']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
 };
 
 export type GetMyQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1788,12 +1815,12 @@ export type GetVisitationQuery = { Visitation?: Maybe<{ __typename?: 'Visitatie'
       & VisitatieBeoordelingCategorieFieldsFragment
     )>>> }> };
 
-export type VisitatieBeoordelingCategorieFieldsFragment = { __typename?: 'VisitatieBeoordelingCategorie', VisitatieBeoordelingCategorieID: string, VisitatieID: number, CategorieTemplateID: number, CategorieNaam: string, Weging: number, TotaalPunten?: Maybe<number>, Cijfer?: Maybe<number>, Versie: string, VanafDatum: any, DatumAangemaakt: any, AangemaaktDoor: string, DatumGewijzigd: any, GewijzigdDoor: string, Vragen?: Maybe<Array<Maybe<(
+export type VisitatieBeoordelingCategorieFieldsFragment = { __typename?: 'VisitatieBeoordelingCategorie', VisitatieBeoordelingCategorieID: string, VisitatieID: number, CategorieTemplateID: number, CategorieNaam: string, Weging: number, TotaalPunten?: Maybe<number>, Cijfer?: Maybe<number>, Versie: string, VanafDatum: any, Vragen?: Maybe<Array<Maybe<(
     { __typename?: 'VisitatieBeoordelingCategorieVraag' }
     & VisitatieBeoorderlingCategorieVraagFieldsFragment
   )>>> };
 
-export type VisitatieBeoorderlingCategorieVraagFieldsFragment = { __typename?: 'VisitatieBeoordelingCategorieVraag', VisitatieBeoordelingCategorieVraagID: string, VisitatieBeoordelingCategorieID: string, CategorieTemplateID: number, VraagTemplateID: number, Naam: string, Weging: number, TotaalPunten?: Maybe<number>, Cijfer?: Maybe<number>, Toelichting?: Maybe<string>, Versie: string, VanafDatum: any, DatumAangemaakt: any, AangemaaktDoor: string, DatumGewijzigd: any, GewijzigdDoor: string };
+export type VisitatieBeoorderlingCategorieVraagFieldsFragment = { __typename?: 'VisitatieBeoordelingCategorieVraag', VisitatieBeoordelingCategorieVraagID: string, VisitatieBeoordelingCategorieID: string, CategorieTemplateID: number, VraagTemplateID: number, Naam: string, Weging: number, TotaalPunten?: Maybe<number>, Cijfer?: Maybe<number>, Toelichting?: Maybe<string>, Versie: string, VanafDatum: any };
 
 export type DiscussieVisitatieFieldsFragment = { __typename?: 'DiscussieVisitatie', DiscussieVisitatieID: number, PersoonID?: Maybe<number>, Commentaar?: Maybe<string>, DatumTijdUTC?: Maybe<any>, IsAuteurVakgroep?: Maybe<boolean>, IsAuteurInspecteur?: Maybe<boolean>, Persoon?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }> };
 
@@ -1821,7 +1848,10 @@ export type UpdateVisitationReportMutationVariables = Exact<{
 }>;
 
 
-export type UpdateVisitationReportMutation = { updateVisitationReport: { __typename?: 'Visitatie', VisitatieID: number, Rapport?: Maybe<string>, Rapportcijfer?: Maybe<number>, DatumRapport?: Maybe<any>, VolgensIntentieAanbod: boolean, VragenJson?: Maybe<any>, Status: string } };
+export type UpdateVisitationReportMutation = { updateVisitationReport: { __typename?: 'Visitatie', VisitatieID: number, Rapport?: Maybe<string>, Rapportcijfer?: Maybe<number>, DatumRapport?: Maybe<any>, VolgensIntentieAanbod: boolean, VragenJson?: Maybe<any>, Status: string, VisitatieBeoordelingCategorieen?: Maybe<Array<Maybe<(
+      { __typename?: 'VisitatieBeoordelingCategorie' }
+      & VisitatieBeoordelingCategorieFieldsFragment
+    )>>> } };
 
 export const VisitatieBeoorderlingCategorieVraagFieldsFragmentDoc = gql`
     fragment VisitatieBeoorderlingCategorieVraagFields on VisitatieBeoordelingCategorieVraag {
@@ -1836,10 +1866,6 @@ export const VisitatieBeoorderlingCategorieVraagFieldsFragmentDoc = gql`
   Toelichting
   Versie
   VanafDatum
-  DatumAangemaakt
-  AangemaaktDoor
-  DatumGewijzigd
-  GewijzigdDoor
 }
     `;
 export const VisitatieBeoordelingCategorieFieldsFragmentDoc = gql`
@@ -1853,10 +1879,6 @@ export const VisitatieBeoordelingCategorieFieldsFragmentDoc = gql`
   Cijfer
   Versie
   VanafDatum
-  DatumAangemaakt
-  AangemaaktDoor
-  DatumGewijzigd
-  GewijzigdDoor
   Vragen {
     ...VisitatieBeoorderlingCategorieVraagFields
   }
@@ -2152,9 +2174,12 @@ export const UpdateVisitationReportDocument = gql`
     VolgensIntentieAanbod
     VragenJson
     Status
+    VisitatieBeoordelingCategorieen {
+      ...VisitatieBeoordelingCategorieFields
+    }
   }
 }
-    `;
+    ${VisitatieBeoordelingCategorieFieldsFragmentDoc}`;
 export type UpdateVisitationReportMutationFn = Apollo.MutationFunction<UpdateVisitationReportMutation, UpdateVisitationReportMutationVariables>;
 
 /**

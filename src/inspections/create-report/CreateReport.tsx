@@ -6,10 +6,10 @@ import {
   useUpdateVisitationReportMutation,
   VisitatieBeoordelingCategorie,
   VisitatieBeoordelingCategorieFieldsFragment,
-  VisitatieBeoordelingCategorieVraag,
+  VisitatieBeoordelingCategorieInput,
+  VisitatieBeoorderlingCategorieVraagFieldsFragment,
   VisitatieStatusEnum,
 } from '../../generated/graphql';
-// import Form, { FormikSchema } from '../../components/Form';
 import { FormItem, FormText } from '@erkenningen/ui/components/form';
 import { Button } from '@erkenningen/ui/components/button';
 import * as yup from 'yup';
@@ -63,7 +63,7 @@ const CreateReport: React.FC<{
 
   let meta: IMeta = { version: 'onbekend' };
   let textQuestionsTemplate: ITextQuestionTemplate[] = [];
-  let ratingsTemplate: VisitatieBeoordelingCategorie[] = [];
+  let ratingsTemplate: VisitatieBeoordelingCategorieInput[] = [];
   if (props.rapportTemplateJson && props?.rapportTemplateJson.length > 0) {
     const jsonTemplate = JSON.parse(props.rapportTemplateJson);
     meta = jsonTemplate.meta;
@@ -74,7 +74,7 @@ const CreateReport: React.FC<{
         : props.categories || getRatingsTemplate(props.visitatieId);
     // ratingsTemplate = getRatingsTemplate(props.visitatieId);
   }
-  console.log('#DH# ratingstemplate', props.categories);
+  // console.log('#DH# ratingstemplate', props.categories);
 
   const [
     updateVisitationReport,
@@ -125,85 +125,11 @@ const CreateReport: React.FC<{
     },
   });
 
-  // [
-  //   {
-  //     question: 'v01_Is_doelstelling_bereikt',
-  //     label: 'Is doelstelling bereikt?',
-  //     validation: 'yupTextQuestion',
-  //   },
-  //   {
-  //     question: 'v02_Aantal_deelnemers',
-  //     label: 'Aantal deelnemers?',
-  //     validation: 'yupTextQuestion',
-  //   },
-  //   {
-  //     question: 'v03_DocentenSLASHinleiders',
-  //     label: 'Docenten / inleiders',
-  //     validation: 'yupTextQuestion',
-  //   },
-  // ];
-
-  // console.log('#DH# textQ Tem', textQuestionsTemplate);
-  // const numberRatingsTemplate: ICategoryTemplate[] = [
-  //   {
-  //     categoryName: 'Uitvoering van doel en inhoud',
-  //     weighing: 50,
-  //     total: 0,
-  //     rating: 0,
-  //     version: '1',
-  //     date: new Date(),
-  //     questions: [
-  //       {
-  //         name: 'Beginsituatie deelnemers nagegaan',
-  //         weighing: 5,
-  //         rating: 0,
-  //         remark: '',
-  //         total: 0,
-  //         version: '1',
-  //         date: new Date(),
-  //       },
-  //       {
-  //         name: 'Op_en_aanmerkingen_beoordelaar_verwerkt',
-  //         weighing: 7,
-  //         rating: 0,
-  //         remark: '',
-  //         total: 0,
-  //         version: '1',
-  //         date: new Date(),
-  //       },
-  //       {
-  //         name: 'Doelstelling_behaald',
-  //         weighing: 13,
-  //         rating: 0,
-  //         remark: '',
-  //         total: 0,
-  //         version: '1',
-  //         date: new Date(),
-  //       },
-  //       {
-  //         name: 'Voorgenomen_inhoud_behandeld',
-  //         weighing: 25,
-  //         rating: 0,
-  //         remark: '',
-  //         total: 0,
-  //         version: '1',
-  //         date: new Date(),
-  //       },
-  //     ],
-  //   },
-  // ];
-
-  // const textQuestionsData: IQuestionType = {
-  //   v01_Is_doelstelling_bereikt: 'Ja',
-  //   v02_Aantal_deelnemers: '15 maar was teveel',
-  //   v03_DocentenSLASHinleiders: 'Waren erg goed',
-  // };
-
   let textQuestions = textQuestionsTemplate.reduce(
     (acc: IQuestionType, curr: IQuestionType) => ((acc[curr.question] = ''), acc),
     {},
   );
-  console.log('#DH# textQuestionsalll', textQuestions, props.vragenJson);
+  // console.log('#DH# textQuestionsalll', textQuestions, props.vragenJson);
   textQuestions = props.vragenJson && JSON.parse(props.vragenJson);
 
   const yupTypes: any = {
@@ -236,9 +162,9 @@ const CreateReport: React.FC<{
     //   }),
     // ),
   });
-  const numberRatings: VisitatieBeoordelingCategorie[] = [...ratingsTemplate];
+  const numberRatings: VisitatieBeoordelingCategorieInput[] = [...ratingsTemplate];
 
-  console.log('#DH# numberRatings', numberRatings);
+  // console.log('#DH# numberRatings', numberRatings);
   const initialValues = {
     // v01_Is_doelstelling_bereikt: '',
     // v02_Aantal_deelnemers: '',
@@ -270,7 +196,18 @@ const CreateReport: React.FC<{
             const report = convertTextQuestionsToReport(values.textQuestions);
 
             const scorings = getScores(values.ratings);
-            console.log('#DH# report val', report);
+            const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
+              // c.__typename
+              const { __typename, ...cat } = c;
+              console.log('#DH# cat', cat);
+              const catWithoutTypeName =
+                cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
+                  const { __typename, ...question } = q;
+                  return question;
+                }) || undefined;
+              return { ...cat, ...{ Vragen: catWithoutTypeName } };
+            });
+            console.log('#DH# ratings', ratings);
             await updateVisitationReport({
               variables: {
                 input: {
@@ -281,6 +218,7 @@ const CreateReport: React.FC<{
                   Rapportcijfer: scorings?.RapportCijfer || 0,
                   VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
                   DatumRapport: new Date(),
+                  ratings: ratings,
                 },
               },
             });
@@ -314,25 +252,25 @@ const CreateReport: React.FC<{
 
                 <div className="form-group">
                   <label className="control-label col-sm-4"></label>
+                  <div className="col-sm-3 form-control-static text-bold">Cijfer</div>
                   <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">Cijfer</div>
                   <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">
-                    Toelichting
-                  </div>
+                  <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
                 </div>
-                {console.log('Formik Values: ', formik.values)}
+                {/* {console.log('Formik Values: ', formik.values)} */}
                 <FieldArray name="numberRatings">
                   {() => (
                     <div>
-                      {formik.values?.ratings?.map((cat: VisitatieBeoordelingCategorie, index) => (
-                        <Category
-                          key={cat.CategorieTemplateID}
-                          subform={formik}
-                          category={cat}
-                          index={index}
-                        ></Category>
-                      ))}
+                      {formik.values?.ratings?.map(
+                        (cat: VisitatieBeoordelingCategorieInput, index) => (
+                          <Category
+                            key={cat.CategorieTemplateID}
+                            subform={formik}
+                            category={cat}
+                            index={index}
+                          ></Category>
+                        ),
+                      )}
                     </div>
                   )}
                 </FieldArray>

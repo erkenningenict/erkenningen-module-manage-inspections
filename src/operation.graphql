@@ -75,10 +75,10 @@ fragment VisitatieBeoordelingCategorieFields on VisitatieBeoordelingCategorie {
   Cijfer
   Versie
   VanafDatum
-  DatumAangemaakt
-  AangemaaktDoor
-  DatumGewijzigd
-  GewijzigdDoor
+  # DatumAangemaakt
+  # AangemaaktDoor
+  # DatumGewijzigd
+  # GewijzigdDoor
   Vragen {
     ...VisitatieBeoorderlingCategorieVraagFields
   }
@@ -96,10 +96,10 @@ fragment VisitatieBeoorderlingCategorieVraagFields on VisitatieBeoordelingCatego
   Toelichting
   Versie
   VanafDatum
-  DatumAangemaakt
-  AangemaaktDoor
-  DatumGewijzigd
-  GewijzigdDoor
+  # DatumAangemaakt
+  # AangemaaktDoor
+  # DatumGewijzigd
+  # GewijzigdDoor
 }
 
 fragment DiscussieVisitatieFields on DiscussieVisitatie {
@@ -188,5 +188,8 @@ mutation updateVisitationReport($input: updateVisitationReportInput!) {
     VolgensIntentieAanbod
     VragenJson
     Status
+    VisitatieBeoordelingCategorieen {
+      ...VisitatieBeoordelingCategorieFields
+    }
   }
 }

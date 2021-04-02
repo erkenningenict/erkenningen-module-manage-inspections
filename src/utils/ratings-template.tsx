@@ -1,10 +1,12 @@
 import {
   VisitatieBeoordelingCategorie,
+  VisitatieBeoordelingCategorieInput,
   VisitatieBeoordelingCategorieVraag,
+  VisitatieBeoordelingCategorieVraagInput,
 } from '../generated/graphql';
 import { v4 as uuidv4 } from 'uuid';
 
-export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCategorie[] {
+export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCategorieInput[] {
   const version = '1';
   const versionDate = new Date(2021, 3, 1);
 
@@ -14,7 +16,7 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
     questionTemplateId: number,
     name: string,
     weighing: number,
-  ): VisitatieBeoordelingCategorieVraag => {
+  ): VisitatieBeoordelingCategorieVraagInput => {
     return {
       VisitatieBeoordelingCategorieVraagID: uuidv4(),
       VisitatieBeoordelingCategorieID: categorieId,
@@ -25,10 +27,10 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
       Cijfer: 0,
       TotaalPunten: 0,
       Toelichting: '',
-      AangemaaktDoor: '',
-      DatumAangemaakt: new Date(),
-      GewijzigdDoor: '',
-      DatumGewijzigd: new Date(),
+      //   AangemaaktDoor: '',
+      //   DatumAangemaakt: new Date(),
+      //   GewijzigdDoor: '',
+      //   DatumGewijzigd: new Date(),
       VanafDatum: versionDate,
       Versie: version,
     };
@@ -38,8 +40,8 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
     categoryId: number,
     name: string,
     weighing: number,
-    questions: VisitatieBeoordelingCategorieVraag[],
-  ): VisitatieBeoordelingCategorie => {
+    questions: VisitatieBeoordelingCategorieVraagInput[],
+  ): VisitatieBeoordelingCategorieInput => {
     return {
       VisitatieID: visitatieId,
       VisitatieBeoordelingCategorieID: uuidv4(),
@@ -48,10 +50,10 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
       Weging: weighing,
       Cijfer: 0,
       TotaalPunten: 0,
-      AangemaaktDoor: '',
-      DatumAangemaakt: new Date(),
-      GewijzigdDoor: '',
-      DatumGewijzigd: new Date(),
+      //   AangemaaktDoor: '',
+      //   DatumAangemaakt: new Date(),
+      //   GewijzigdDoor: '',
+      //   DatumGewijzigd: new Date(),
       VanafDatum: versionDate,
       Versie: version,
       Vragen: questions,

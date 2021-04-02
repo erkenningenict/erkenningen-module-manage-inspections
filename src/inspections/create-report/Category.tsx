@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { FieldArray, FormikProps } from 'formik';
 import RatingItem from './RatingItem';
 import {
-  VisitatieBeoordelingCategorie,
-  VisitatieBeoordelingCategorieVraag,
+  VisitatieBeoordelingCategorieInput,
+  VisitatieBeoordelingCategorieVraagInput,
 } from '../../generated/graphql';
 
 const Category: React.FC<{
   subform: FormikProps<any>;
-  category: VisitatieBeoordelingCategorie;
+  category: VisitatieBeoordelingCategorieInput;
   index: number;
 }> = (props) => {
   let categoryTotal = 0;
@@ -16,30 +16,33 @@ const Category: React.FC<{
   useEffect(() => {
     // console.log('#DH# category FX ', props.subform);
     categoryTotal = props.subform.values.ratings[props.index].Vragen?.reduce(
-      (total: number, qA: VisitatieBeoordelingCategorieVraag) => {
-        console.log('#DH# questionV', total, qA);
+      (total: number, qA: VisitatieBeoordelingCategorieVraagInput) => {
         return total + (qA?.TotaalPunten || 0);
       },
       0,
     );
     // console.log('#DH# cat total', categoryTotal);
-    props.subform.setFieldValue(`ratings.${props.index}.TotaalPunten`, categoryTotal?.toFixed(1));
+    props.subform.setFieldValue(
+      `ratings.${props.index}.TotaalPunten`,
+      parseFloat(categoryTotal?.toFixed(1)),
+    );
     // if (categoryTotal && props.subform.values.ratings[props.index].Weging) {
     props.subform.setFieldValue(
       `ratings.${props.index}.Cijfer`,
-      ((categoryTotal / props.subform.values.ratings[props.index].Weging) * 10).toFixed(1),
+      parseFloat(
+        ((categoryTotal / props.subform.values.ratings[props.index].Weging) * 10).toFixed(1),
+      ),
     );
     // }
   }, [props.subform.values]);
-  console.log('#DH# props', props.subform.values.ratings);
   return (
     <>
       <div className="form-group" style={{ backgroundColor: '#eee' }}>
         <label className="control-label col-sm-4 textRight">
           {props?.category?.CategorieNaam?.replace(/_/g, ' ')}
         </label>
-        <div className="col-sm-1">
-          <div className="form-control-static textRight">
+        <div className="col-sm-3">
+          <div className="form-control-static">
             {props.subform.values.ratings[props.index].Weging}
           </div>
         </div>
@@ -58,7 +61,7 @@ const Category: React.FC<{
         {() => (
           <div>
             {props.subform.values.ratings[props.index].Vragen?.map(
-              (q: VisitatieBeoordelingCategorieVraag, qIndex: number) => (
+              (q: VisitatieBeoordelingCategorieVraagInput, qIndex: number) => (
                 <RatingItem
                   key={qIndex}
                   question={q}
