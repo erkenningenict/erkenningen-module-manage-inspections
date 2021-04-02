@@ -1,0 +1,15 @@
+.discussionRow {
+  padding: 5px 5px;
+}
+
+.odd {
+  background: #eee;
+}
+
+.dateTime {
+  font-weight: bold;
+}
+
+.source {
+  font-style: italic;
+}

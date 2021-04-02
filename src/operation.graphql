@@ -1,0 +1,177 @@
+query getMy {
+  my {
+    Roles
+    Persoon {
+      PersoonID
+    }
+  }
+}
+
+query getVisitations($input: visitationsInput!) {
+  Visitations(input: $input) {
+    totalCount
+    nodes {
+      VisitatieID
+      SessieID
+      DatumVisitatie
+      DatumRapport
+      Rapportcijfer
+      PersoonID
+      Status
+      VolgensIntentieAanbod
+      Cursus {
+        CursusID
+        VakID
+        CursusCode
+        Titel
+      }
+      IsDeclarationPossible
+      IsDeclarationSubmitted
+      LastChangeBy
+      LastChangeDate
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+query getVisitation($input: visitationInput!) {
+  Visitation(input: $input) {
+    VisitatieID
+    SessieID
+    Sessie {
+      SessieType
+    }
+    DatumVisitatie
+    DatumRapport
+    Rapportcijfer
+    Rapport
+    RapportTemplateJson
+    VragenJson
+    Status
+    VolgensIntentieAanbod
+    PersoonID
+    Inspecteur {
+      SortableFullName
+    }
+    DiscussieVisitaties {
+      ...DiscussieVisitatieFields
+    }
+    VisitatieBeoordelingCategorieen {
+      ...VisitatieBeoordelingCategorieFields
+    }
+  }
+}
+
+fragment VisitatieBeoordelingCategorieFields on VisitatieBeoordelingCategorie {
+  VisitatieBeoordelingCategorieID
+  VisitatieID
+  CategorieNaam
+  Weging
+  TotaalPunten
+  Cijfer
+  Versie
+  Vragen {
+    ...VisitatieBeoorderlingCategorieVraagFields
+  }
+}
+
+fragment VisitatieBeoorderlingCategorieVraagFields on VisitatieBeoordelingCategorieVraag {
+  VisitatieBeoordelingCategorieVraagID
+  VisitatieBeoordelingCategorieID
+	Naam
+  Weging
+  TotaalPunten
+  Cijfer
+  Toelichting
+  Versie
+}
+
+
+fragment DiscussieVisitatieFields on DiscussieVisitatie {
+  DiscussieVisitatieID
+  PersoonID
+  Commentaar
+  DatumTijdUTC
+  IsAuteurVakgroep
+  IsAuteurInspecteur
+  Persoon {
+    SortableFullName
+  }
+}
+
+query getSession($sessieId: Int!) {
+  Sessie(sessieId: $sessieId) {
+    ...SessionInfo
+  }
+}
+
+fragment SessionInfo on Sessie {
+  SessieID
+  SessieType
+  CursusID
+  Datum
+  DatumBegintijd
+  DatumEindtijd
+  Lokatie {
+    Naam
+    Contactgegevens {
+      DisplayAddress
+    }
+  }
+  Cursus {
+    VakID
+    CursusID
+    Titel
+    Promotietekst
+    Vak {
+      ThemaNaam
+      CompetentieNaam
+      EvaluatieWijze
+      Vakgroep {
+        Naam
+        Contactgegevens {
+          DisplayAddress
+          TerAttentieVan
+          Telefoon
+          Email
+        }
+      }
+      ExamenInstelling {
+        Naam
+        Contactgegevens {
+          DisplayAddress
+          TerAttentieVan
+          Telefoon
+          Email
+        }
+      }
+      BeoordelaarNaam
+    }
+  }
+}
+
+mutation addVisitationComment($input: addVisitationCommentInput!) {
+  addVisitationComment(input: $input) {
+    DiscussieVisitatieID
+    VisitatieID
+    PersoonID
+    DatumTijdUTC
+    IsAuteurVakgroep
+    IsAuteurInspecteur
+    Persoon {
+      SortableFullName
+    }
+  }
+}
+
+mutation updateVisitationReport($input: updateVisitationReportInput!) {
+  updateVisitationReport(input: $input) {
+    VisitatieID
+   	Rapport
+    VragenJson
+    RapportTemplateJson
+  }
+}

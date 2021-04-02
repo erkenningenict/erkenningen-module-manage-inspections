@@ -1,0 +1,25 @@
+body button:not(:last-of-type) {
+  margin-right: 0.5rem;
+}
+
+body .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.5rem;
+}
+
+body .p-datatable .p-datatable-tbody button {
+  font-size: 1.3rem;
+}
+
+.mb-1 {
+  margin-bottom: 1em;
+}
+
+@media print {
+  .hidden-print {
+    display: none !important;
+  }
+}
+
+.textRight {
+  text-align: right;
+}

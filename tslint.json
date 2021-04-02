@@ -1,0 +1,10 @@
+{
+  "extends": ["eslint:recommended", "eslint-react", "eslint-config-prettier"],
+  "linterOptions": {
+    "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
+  },
+  "rules": {
+    "object-literal-sort-keys": false,
+    "jsx-no-lambda": false
+  }
+}

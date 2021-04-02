@@ -1,0 +1,31 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    ACCESS-CONTROL-ALLOW-ORIGIN = "*"
+[build]
+  publish = "build"
+  command = "npm run build:netlify"
+[context.production.environment]
+  NODE_ENV = "production"
+  REACT_APP_ERKENNINGEN_GRAPHQL_API_URL = "https://api.erkenningen.nl/graphql"
+  REACT_APP_ERKENNINGEN_ADMIN_URL = "https://administratie.erkenningen.nl"
+  REACT_APP_ERKENNINGEN_SITE_TYPE = "content"
+  GASTBY_ERKENNINGEN_GRAPHQL_API_URL = "https://api.erkenningen.nl/graphql"
+  GASTBY_ERKENNINGEN_ADMIN_URL = "https://administratie.erkenningen.nl"
+  GASTBY_ERKENNINGEN_SITE_TYPE = "content"
+[context.acceptance.environment]
+  NODE_ENV = "production"
+  REACT_APP_ERKENNINGEN_GRAPHQL_API_URL = "https://api.acceptatie.erkenningen.nl/graphql"
+  REACT_APP_ERKENNINGEN_ADMIN_URL = "https://administratie.acceptatie.erkenningen.nl"
+  REACT_APP_ERKENNINGEN_SITE_TYPE = "content"
+  GASTBY_ERKENNINGEN_GRAPHQL_API_URL = "https://api.acceptatie.erkenningen.nl/graphql"
+  GASTBY_ERKENNINGEN_ADMIN_URL = "https://administratie.acceptatie.erkenningen.nl"
+  GASTBY_ERKENNINGEN_SITE_TYPE = "content"
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+  REACT_APP_ERKENNINGEN_GRAPHQL_API_URL = "https://api.acceptatie.erkenningen.nl/graphql"
+  REACT_APP_ERKENNINGEN_ADMIN_URL = "https://administratie.acceptatie.erkenningen.nl"
+  REACT_APP_ERKENNINGEN_SITE_TYPE = "content"
+  GASTBY_ERKENNINGEN_GRAPHQL_API_URL = "https://api.acceptatie.erkenningen.nl/graphql"
+  GASTBY_ERKENNINGEN_ADMIN_URL = "https://administratie.acceptatie.erkenningen.nl"
+  GASTBY_ERKENNINGEN_SITE_TYPE = "content"  

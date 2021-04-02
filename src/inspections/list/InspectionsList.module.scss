@@ -1,0 +1,22 @@
+.center {
+  text-align: center;
+
+  @media screen and (max-width: 40em) {
+    text-align: left;
+  }
+}
+
+.reportNumber {
+  // width: 20px;
+}
+
+.icon {
+  // margin-left: 15px;
+  // text-align: right;
+}
+
+.reportNumberColumn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
