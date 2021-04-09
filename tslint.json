@@ -5,6 +5,7 @@
   },
   "rules": {
     "object-literal-sort-keys": false,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "ignoreRestSiblings": true
   }
 }

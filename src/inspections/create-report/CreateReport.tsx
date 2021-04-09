@@ -4,43 +4,29 @@ import {
   GetVisitationDocument,
   GetVisitationQuery,
   useUpdateVisitationReportMutation,
-  VisitatieBeoordelingCategorie,
   VisitatieBeoordelingCategorieFieldsFragment,
   VisitatieBeoordelingCategorieInput,
   VisitatieBeoorderlingCategorieVraagFieldsFragment,
   VisitatieStatusEnum,
 } from '../../generated/graphql';
-import { FormItem, FormText } from '@erkenningen/ui/components/form';
 import { Button } from '@erkenningen/ui/components/button';
 import * as yup from 'yup';
-import Category from './Category';
-import { FieldArray, Form, Formik } from 'formik';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { convertTextQuestionsToReport } from '../../utils/strings';
 import { getScores } from '../../utils/scoring';
 import { getRatingsTemplate } from '../../utils/ratings-template';
-
-export type IInspectionReport = {
-  textQuestions: ITextQuestionTemplate[];
-  textQuestionsVersion: string;
-  textQuestionsDate: Date;
-  ratings: VisitatieBeoordelingCategorie[];
-  ratingsVersion: string;
-  ratingsDate: Date;
-};
+import { useFieldArray, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import TextQuestions from './TextQuestions';
+import { getTextQuestionTemplate } from '../../utils/questions-template';
+import { IQuestionType } from '../../types/text-questions';
+import RatingCategories from './RatingCategories';
 
 export type ITextQuestionTemplate = {
   question: string;
   label: string;
   validation: string;
-};
-
-export type IQuestionType = {
-  [key: string]: string;
-};
-type IQuestionValidationType = {
-  [key: string]: any;
 };
 
 type IMeta = {
@@ -62,12 +48,13 @@ const CreateReport: React.FC<{
   // console.log('#DH# json', props.rapportJson);
 
   let meta: IMeta = { version: 'onbekend' };
-  let textQuestionsTemplate: ITextQuestionTemplate[] = [];
+  // let textQuestionsTemplate: ITextQuestionTemplate[] = [];
   let ratingsTemplate: VisitatieBeoordelingCategorieInput[] = [];
+
   if (props.rapportTemplateJson && props?.rapportTemplateJson.length > 0) {
     const jsonTemplate = JSON.parse(props.rapportTemplateJson);
     meta = jsonTemplate.meta;
-    textQuestionsTemplate = jsonTemplate.textQuestionsTemplate;
+    // textQuestionsTemplate = jsonTemplate.textQuestionsTemplate;
     ratingsTemplate =
       props.categories === undefined || props.categories?.length === 0
         ? getRatingsTemplate(props.visitatieId)
@@ -125,53 +112,106 @@ const CreateReport: React.FC<{
     },
   });
 
-  let textQuestions = textQuestionsTemplate.reduce(
-    (acc: IQuestionType, curr: IQuestionType) => ((acc[curr.question] = ''), acc),
-    {},
-  );
-  // console.log('#DH# textQuestionsalll', textQuestions, props.vragenJson);
-  textQuestions = props.vragenJson && JSON.parse(props.vragenJson);
+  const textQuestions =
+    props.vragenJson === undefined || props.categories?.length === 0
+      ? getTextQuestionTemplate()
+      : (JSON.parse(props.vragenJson) as IQuestionType[]);
 
   const yupTypes: any = {
-    yupTextQuestion: yup.string().max(250),
+    yupTextQuestion: yup.string().max(4),
+    yupRating: yup
+      .number()
+      .integer('Alleen gehele getallen tussen 0 en 10')
+      .min(0, 'Cijfer tussen 0 en 10')
+      .max(10, 'Cijfer tussen 0 en 10')
+      .required(),
   };
-
-  const textQuestionsValidationScheme = textQuestionsTemplate.reduce(
-    (acc: IQuestionValidationType, curr: IQuestionValidationType): any => (
-      (acc[curr.question] = yupTypes[curr.validation]), acc
-    ),
-    {},
-  );
 
   // console.log('#DH# scheme', textQuestionsValidationScheme);
   const schemaNormal = yup.object().shape({
-    textQuestions: yup.object().shape(textQuestionsValidationScheme),
-    // ratings: yup.array().of(
-    //   yup.object().shape({
-    //     categoryName: yupString,
-    //     weighing: yupWeighing,
-    //     rating: yupWeighing,
-    //     questions: yup.array().of(
-    //       yup.object().shape({
-    //         name: yupString,
-    //         weighing: yupWeighing,
-    //         rating: yupRating,
-    //         total: yupWeighing,
-    //       }),
-    //     ),
-    //   }),
-    // ),
+    textQuestions: yup.array().of(
+      yup.object().shape({
+        answer: yupTypes['yupTextQuestion'],
+      }),
+    ),
+    ratings: yup.array().of(
+      yup.object().shape({
+        // categoryName: yupString,
+        // weighing: yupWeighing,
+        // rating: yupWeighing,
+        Vragen: yup.array().of(
+          yup.object().shape({
+            Cijfer: yupTypes['yupRating'],
+            Toelichting: yupTypes['yupTextQuestion'],
+            // name: yupString,
+            // weighing: yupWeighing,
+            // rating: yupRating,
+            // total: yupWeighing,
+          }),
+        ),
+      }),
+    ),
   });
+  // console.log('#DH# schema', schemaNormal);
   const numberRatings: VisitatieBeoordelingCategorieInput[] = [...ratingsTemplate];
 
-  // console.log('#DH# numberRatings', numberRatings);
-  const initialValues = {
-    // v01_Is_doelstelling_bereikt: '',
-    // v02_Aantal_deelnemers: '',
+  const defaultValues = {
     textQuestions: textQuestions,
     ratings: numberRatings,
   };
-  // console.log('#DH# initial', initialValues.textQuestions);
+  // console.log('#DH# defaultValues', defaultValues);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    getValues,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
+  const { fields: textFields } = useFieldArray({
+    name: 'textQuestions' as `textQuestions`,
+    control,
+  });
+  const { fields: ratingFields } = useFieldArray({
+    name: 'ratings' as `ratings`,
+    control,
+  });
+
+  const onSubmit = async (values: any) => {
+    console.log('#DH# SAVEDDDDDD', values);
+    const report = convertTextQuestionsToReport(values.textQuestions);
+
+    const scorings = getScores(values.ratings);
+    const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
+      // c.__typename
+      const { __typename, ...cat } = c;
+      console.log('#DH# cat', cat);
+      const catWithoutTypeName =
+        cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
+          const { __typename, ...question } = q;
+          return question;
+        }) || undefined;
+      return { ...cat, ...{ Vragen: catWithoutTypeName } };
+    });
+    console.log('#DH# ratings', ratings);
+    await updateVisitationReport({
+      variables: {
+        input: {
+          VisitatieID: props.visitatieId,
+          Status: VisitatieStatusEnum.RapportWordtOpgesteld,
+          VragenJson: JSON.stringify(values.textQuestions),
+          Rapport: report,
+          Rapportcijfer: scorings?.RapportCijfer || 0,
+          VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
+          DatumRapport: new Date(),
+          ratings: ratings,
+        },
+      },
+    });
+  };
+  console.log('#DH# defaultValues', defaultValues);
 
   return (
     <Panel
@@ -188,103 +228,43 @@ const CreateReport: React.FC<{
       </div>
       {updateVisitationReportLoading && <Spinner text="Rapport wordt opgeslagen"></Spinner>}
       {!updateVisitationReportLoading && (
-        <Formik
-          initialValues={initialValues}
-          validationSchema={schemaNormal}
-          onSubmit={async (values: any) => {
-            console.log('#DH# save values', values);
-            const report = convertTextQuestionsToReport(values.textQuestions);
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-horizontal">
+            <>
+              <TextQuestions
+                register={register}
+                errors={errors}
+                fields={textFields}
+              ></TextQuestions>
+            </>
+            <div className="panel-body">
+              <h4>Cijfers</h4>
+            </div>
 
-            const scorings = getScores(values.ratings);
-            const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
-              // c.__typename
-              const { __typename, ...cat } = c;
-              console.log('#DH# cat', cat);
-              const catWithoutTypeName =
-                cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
-                  const { __typename, ...question } = q;
-                  return question;
-                }) || undefined;
-              return { ...cat, ...{ Vragen: catWithoutTypeName } };
-            });
-            console.log('#DH# ratings', ratings);
-            await updateVisitationReport({
-              variables: {
-                input: {
-                  VisitatieID: props.visitatieId,
-                  Status: VisitatieStatusEnum.RapportWordtOpgesteld,
-                  VragenJson: JSON.stringify(values.textQuestions),
-                  Rapport: report,
-                  Rapportcijfer: scorings?.RapportCijfer || 0,
-                  VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
-                  DatumRapport: new Date(),
-                  ratings: ratings,
-                },
-              },
-            });
-          }}
-        >
-          {(formik) => (
-            <Form noValidate>
-              <div className="form-horizontal">
-                {Object.keys(initialValues.textQuestions)
-                  .filter((q) => q !== 'ratings')
-                  .map((question: string) => {
-                    return (
-                      <FormText
-                        key={question}
-                        name={`textQuestions.${question}`}
-                        label={question
-                          .replace(/_/g, ' ')
-                          .replace('SLASH', '/')
-                          .concat('?')
-                          .substr(4, question.length)}
-                        labelClassNames={'col-sm-4'}
-                        formControlClassName="col-sm-8"
-                        isTextArea={true}
-                      />
-                    );
-                  })}
+            <div className="form-group">
+              <label className="control-label col-sm-4"></label>
+              <div className="col-sm-3 form-control-static text-bold">Cijfer</div>
+              <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
+              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
+              <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
+            </div>
+            <RatingCategories
+              {...{ control, register, watch, defaultValues, getValues, setValue, errors }}
+              fields={ratingFields}
+            ></RatingCategories>
 
-                <div className="panel-body">
-                  <h4>Cijfers</h4>
-                </div>
-
-                <div className="form-group">
-                  <label className="control-label col-sm-4"></label>
-                  <div className="col-sm-3 form-control-static text-bold">Cijfer</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-                  <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
-                  <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
-                </div>
-                {/* {console.log('Formik Values: ', formik.values)} */}
-                <FieldArray name="numberRatings">
-                  {() => (
-                    <div>
-                      {formik.values?.ratings?.map(
-                        (cat: VisitatieBeoordelingCategorieInput, index) => (
-                          <Category
-                            key={cat.CategorieTemplateID}
-                            subform={formik}
-                            category={cat}
-                            index={index}
-                          ></Category>
-                        ),
-                      )}
-                    </div>
-                  )}
-                </FieldArray>
-                <FormItem
-                  label={''}
-                  labelClassNames={'col-sm-4'}
-                  formControlClassName={'col-sm-8 col-sm-offset-4'}
-                >
-                  <Button label={'Rapport opslaan'} buttonType="submit" icon="pi pi-check" />
-                </FormItem>
+            <div className="form-group">
+              <div className="col-sm-8 col-sm-offset-4">
+                <Button
+                  disabled={!isValid}
+                  label={'Rapport opslaan'}
+                  buttonType="submit"
+                  icon="pi pi-check"
+                />
               </div>
-            </Form>
-          )}
-        </Formik>
+            </div>
+          </div>
+        </form>
       )}
     </Panel>
   );
