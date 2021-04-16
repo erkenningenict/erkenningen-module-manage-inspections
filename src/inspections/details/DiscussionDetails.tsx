@@ -117,7 +117,7 @@ const DiscussionDetails: React.FC<{
                   icon="pi pi-check"
                   disabled={!isValid}
                   buttonType="submit"
-                  // loading={addCommentLoading}
+                  loading={addCommentLoading}
                 />
               </div>
             </div>

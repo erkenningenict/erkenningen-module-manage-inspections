@@ -41,27 +41,18 @@ const CreateReport: React.FC<{
   categories?: VisitatieBeoordelingCategorieFieldsFragment[];
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
-  // const yupString = yup.string().max(500);
-  // const yupTextQuestion = yup.string().max(5);
-  // const yupWeighing = yup.number().min(0).max(100);
-  // const yupRating = yup.number().min(0).max(10);
-  // console.log('#DH# json', props.rapportJson);
 
   let meta: IMeta = { version: 'onbekend' };
-  // let textQuestionsTemplate: ITextQuestionTemplate[] = [];
   let ratingsTemplate: VisitatieBeoordelingCategorieInput[] = [];
 
   if (props.rapportTemplateJson && props?.rapportTemplateJson.length > 0) {
     const jsonTemplate = JSON.parse(props.rapportTemplateJson);
     meta = jsonTemplate.meta;
-    // textQuestionsTemplate = jsonTemplate.textQuestionsTemplate;
     ratingsTemplate =
       props.categories === undefined || props.categories?.length === 0
         ? getRatingsTemplate(props.visitatieId)
         : props.categories || getRatingsTemplate(props.visitatieId);
-    // ratingsTemplate = getRatingsTemplate(props.visitatieId);
   }
-  // console.log('#DH# ratingstemplate', props.categories);
 
   const [
     updateVisitationReport,
@@ -186,10 +177,12 @@ const CreateReport: React.FC<{
     const scorings = getScores(values.ratings);
     const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
       // c.__typename
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...cat } = c;
       console.log('#DH# cat', cat);
       const catWithoutTypeName =
         cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { __typename, ...question } = q;
           return question;
         }) || undefined;

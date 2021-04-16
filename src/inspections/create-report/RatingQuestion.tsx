@@ -1,9 +1,6 @@
-import React, { useEffect } from 'react';
-import { useFieldArray, UseFormRegister, useWatch } from 'react-hook-form';
-import {
-  VisitatieBeoordelingCategorieInput,
-  VisitatieBeoordelingCategorieVraagInput,
-} from '../../generated/graphql';
+import React from 'react';
+import { useFieldArray, UseFormRegister } from 'react-hook-form';
+import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
 import { IQuestionType } from '../../types/text-questions';
 import TextareaAutosize from 'react-autosize-textarea';
 import RatingTotal from './RatingTotal';
@@ -82,10 +79,10 @@ const RatingQuestion: React.FC<{
   //   register(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const);
   // }, [register]);
 
-  const handleRatingChange = (rating: number, index: number) => {
-    console.log('#DH# rating', rating);
-    setValue(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, rating);
-  };
+  // const handleRatingChange = (rating: number, index: number) => {
+  //   console.log('#DH# rating', rating);
+  //   setValue(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, rating);
+  // };
 
   return (
     <>

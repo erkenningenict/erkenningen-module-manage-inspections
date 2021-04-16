@@ -67,7 +67,7 @@ const RatingCategories: React.FC<{
               <div className="form-control-static textRight">
                 <CategoryRatingTotal
                   {...{ index, getValues, watch, setValue, control }}
-                  weging={field.Weging}
+                  // weging={field.Weging}
                 ></CategoryRatingTotal>
                 <input
                   {...register(`ratings.${index}.VisitatieBeoordelingCategorieID` as const)}
