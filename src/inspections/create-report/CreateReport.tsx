@@ -16,12 +16,13 @@ import { Spinner } from '@erkenningen/ui/components/spinner';
 import { convertTextQuestionsToReport } from '../../utils/strings';
 import { getScores } from '../../utils/scoring';
 import { getRatingsTemplate } from '../../utils/ratings-template';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextQuestions from './TextQuestions';
 import { getTextQuestionTemplate } from '../../utils/questions-template';
 import { IQuestionType } from '../../types/text-questions';
 import RatingCategories from './RatingCategories';
+import ReportTotal from './ReportTotal';
 
 export type ITextQuestionTemplate = {
   question: string;
@@ -49,7 +50,7 @@ const CreateReport: React.FC<{
     const jsonTemplate = JSON.parse(props.rapportTemplateJson);
     meta = jsonTemplate.meta;
     ratingsTemplate =
-      props.categories === undefined || props.categories?.length === 0
+      props.categories === undefined || props.categories === null || props.categories?.length === 0
         ? getRatingsTemplate(props.visitatieId)
         : props.categories || getRatingsTemplate(props.visitatieId);
   }
@@ -104,7 +105,7 @@ const CreateReport: React.FC<{
   });
 
   const textQuestions =
-    props.vragenJson === undefined || props.categories?.length === 0
+    props.vragenJson === undefined || props.vragenJson === null || props.categories?.length === 0
       ? getTextQuestionTemplate()
       : (JSON.parse(props.vragenJson) as IQuestionType[]);
 
@@ -116,6 +117,7 @@ const CreateReport: React.FC<{
       .min(0, 'Cijfer tussen 0 en 10')
       .max(10, 'Cijfer tussen 0 en 10')
       .required(),
+    yupRatingsRemark: yup.string().max(500),
   };
 
   // console.log('#DH# scheme', textQuestionsValidationScheme);
@@ -127,22 +129,16 @@ const CreateReport: React.FC<{
     ),
     ratings: yup.array().of(
       yup.object().shape({
-        // categoryName: yupString,
-        // weighing: yupWeighing,
-        // rating: yupWeighing,
         Vragen: yup.array().of(
           yup.object().shape({
             Cijfer: yupTypes['yupRating'],
-            Toelichting: yupTypes['yupTextQuestion'],
-            // name: yupString,
-            // weighing: yupWeighing,
-            // rating: yupRating,
-            // total: yupWeighing,
+            Toelichting: yupTypes['yupRatingsRemark'],
           }),
         ),
       }),
     ),
   });
+
   // console.log('#DH# schema', schemaNormal);
   const numberRatings: VisitatieBeoordelingCategorieInput[] = [...ratingsTemplate];
 
@@ -161,14 +157,12 @@ const CreateReport: React.FC<{
     watch,
     formState: { errors, isValid },
   } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
-  const { fields: textFields } = useFieldArray({
-    name: 'textQuestions' as `textQuestions`,
-    control,
-  });
+
   const { fields: ratingFields } = useFieldArray({
     name: 'ratings' as `ratings`,
     control,
   });
+  const ratings = useWatch({ control, name: `ratings` });
 
   const onSubmit = async (values: any) => {
     console.log('#DH# SAVEDDDDDD', values);
@@ -176,7 +170,6 @@ const CreateReport: React.FC<{
 
     const scorings = getScores(values.ratings);
     const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
-      // c.__typename
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...cat } = c;
       console.log('#DH# cat', cat);
@@ -204,6 +197,7 @@ const CreateReport: React.FC<{
       },
     });
   };
+
   // console.log('#DH# defaultValues', defaultValues);
 
   return (
@@ -223,29 +217,16 @@ const CreateReport: React.FC<{
       {!updateVisitationReportLoading && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-horizontal">
-            <>
-              <TextQuestions
-                register={register}
-                errors={errors}
-                fields={textFields}
-              ></TextQuestions>
-            </>
+            ERRORS: {JSON.stringify(errors)}
+            <TextQuestions {...{ control, register, errors }}></TextQuestions>
             <div className="panel-body">
               <h4>Cijfers</h4>
-            </div>
-
-            <div className="form-group">
-              <label className="control-label col-sm-4"></label>
-              <div className="col-sm-3 form-control-static text-bold">Cijfer</div>
-              <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
-              <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
             </div>
             <RatingCategories
               {...{ control, register, watch, defaultValues, getValues, setValue, errors }}
               fields={ratingFields}
             ></RatingCategories>
-
+            <ReportTotal numberRatings={ratings}></ReportTotal>
             <div className="form-group">
               <div className="col-sm-8 col-sm-offset-4">
                 <Button

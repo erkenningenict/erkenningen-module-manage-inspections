@@ -1,4 +1,4 @@
-import { VisitatieBeoordelingCategorie } from '../generated/graphql';
+import { VisitatieBeoordelingCategorieInput } from '../generated/graphql';
 
 export type IGetScoreReturnValues = {
   RapportCijfer: number;
@@ -6,34 +6,34 @@ export type IGetScoreReturnValues = {
 };
 
 export function getScores(
-  categories: VisitatieBeoordelingCategorie[] | undefined,
+  categories: VisitatieBeoordelingCategorieInput[] | undefined,
 ): IGetScoreReturnValues | undefined {
   if (categories === undefined) {
     return undefined;
   }
   const findCategory = (categoryName: string) =>
     categories.find((c) => c.CategorieNaam === categoryName);
-  const findQuestion = (category: VisitatieBeoordelingCategorie, questionName: string) =>
+  const findQuestion = (category: VisitatieBeoordelingCategorieInput, questionName: string) =>
     category.Vragen?.find((q) => q.Naam === questionName);
-  const categoryUitvoering: VisitatieBeoordelingCategorie | undefined = findCategory(
+  const categoryUitvoering: VisitatieBeoordelingCategorieInput | undefined = findCategory(
     'Uitvoering van doel en inhoud',
   );
-  const categoryAanpak: VisitatieBeoordelingCategorie | undefined = findCategory('Aanpak');
+  const categoryAanpak: VisitatieBeoordelingCategorieInput | undefined = findCategory('Aanpak');
 
   let goalTotal = 0;
   if (categoryUitvoering) {
-    const doelstellingBehaald = findQuestion(categoryUitvoering, 'Doelstelling_behaald');
+    const doelstellingBehaald = findQuestion(categoryUitvoering, 'Doelstelling behaald');
     goalTotal += doelstellingBehaald?.TotaalPunten || 0;
     const voorgenomenInhoudBehandeld = findQuestion(
       categoryUitvoering,
-      'Voorgenomen_inhoud_behandeld',
+      'Voorgenomen inhoud behandeld',
     );
     goalTotal += voorgenomenInhoudBehandeld?.TotaalPunten || 0;
   }
   if (categoryAanpak) {
     const werkwijzeAlsGeplandToegepast = findQuestion(
       categoryAanpak,
-      'Werkwijze_als_gepland_toegepast',
+      'Werkwijze als gepland toegepast',
     );
     goalTotal += werkwijzeAlsGeplandToegepast?.TotaalPunten || 0;
   }
@@ -43,7 +43,7 @@ export function getScores(
     volgensIntentieAanbod = false;
   }
   const ratingsTotal = categories.reduce(
-    (total: number, c: VisitatieBeoordelingCategorie) => (c?.TotaalPunten || 0) + total,
+    (total: number, c: VisitatieBeoordelingCategorieInput) => (c?.TotaalPunten || 0) + total,
     0,
   );
 

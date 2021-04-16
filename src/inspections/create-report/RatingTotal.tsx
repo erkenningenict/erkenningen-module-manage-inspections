@@ -13,6 +13,7 @@ const RatingTotal: React.FC<{
   const c = useWatch({ control, name: `ratings.${nestIndex}.Vragen.${index}.Cijfer` });
   const cijfer = c;
   const total = (weging * cijfer) / 10 || 0;
+
   useEffect(() => {
     setValue(`ratings.${nestIndex}.Vragen.${index}.TotaalPunten` as const, total);
     const categoryQuestions = getValues(`ratings.${nestIndex}.Vragen`);
@@ -29,7 +30,7 @@ const RatingTotal: React.FC<{
     setValue(`ratings.${nestIndex}.Cijfer` as const, categoryRating || 0);
   }, [c, nestIndex, index]);
 
-  return <div>{total}</div>;
+  return <span>{total}</span>;
 };
 
 export default RatingTotal;

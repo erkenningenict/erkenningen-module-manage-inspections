@@ -7,7 +7,8 @@ const CategoryRatingTotal: React.FC<{
 }> = ({ index, control }) => {
   const c = useWatch({ control, name: `ratings.${index}` });
   const total = c.TotaalPunten || 0;
-  return <div>{total}</div>;
+
+  return <span>{total}</span>;
 };
 
 export default CategoryRatingTotal;

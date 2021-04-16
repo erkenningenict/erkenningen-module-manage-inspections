@@ -53,40 +53,66 @@ const RatingCategories: React.FC<{
     <>
       {fields?.map((field, index) => (
         <div key={field.id}>
-          <div style={{ backgroundColor: '#eee' }} className={`form-group }`}>
-            <label className="control-label col-sm-4 textRight">{field.CategorieNaam}</label>
-            <div className="col-sm-3">
-              <div className="form-control-static">
-                <CategoryRating {...{ index, control }}></CategoryRating>
+          <div className="sticky" style={{ backgroundColor: '#eee' }}>
+            <div
+              className="form-group hidden-xs"
+              style={{
+                backgroundColor: '#eee',
+                marginBottom: 0,
+              }}
+            >
+              <label className="control-label col-sm-4"></label>
+              <div className="col-sm-3 form-control-static text-bold">Cijfer</div>
+              <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
+              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div>
+              <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
+            </div>
+            <div className={`form-group`}>
+              <label className="control-label col-sm-4 textRight">{field.CategorieNaam}</label>
+              <div className="col-sm-3">
+                <div className="form-control-static">
+                  <span className="visible-xs-inline">Cijfer: </span>
+                  <CategoryRating {...{ index, control }}></CategoryRating>
+                </div>
               </div>
-            </div>
-            <div className="col-sm-1">
-              <div className="form-control-static textRight">{field.Weging}</div>
-            </div>
-            <div className="col-sm-1">
-              <div className="form-control-static textRight">
-                <CategoryRatingTotal
-                  {...{ index, getValues, watch, setValue, control }}
-                  // weging={field.Weging}
-                ></CategoryRatingTotal>
-                <input
-                  {...register(`ratings.${index}.VisitatieBeoordelingCategorieID` as const)}
-                  className="hidden"
-                />
-                <input {...register(`ratings.${index}.VisitatieID` as const)} className="hidden" />
-                <input
-                  {...register(`ratings.${index}.CategorieNaam` as const)}
-                  className="hidden"
-                />
-                <input {...register(`ratings.${index}.Weging` as const)} className="hidden" />
-                <input {...register(`ratings.${index}.TotaalPunten` as const)} className="hidden" />
-                <input {...register(`ratings.${index}.Cijfer` as const)} className="hidden" />
-                <input {...register(`ratings.${index}.Versie` as const)} className="hidden" />
-                <input {...register(`ratings.${index}.VanafDatum` as const)} className="hidden" />
-                <input
-                  {...register(`ratings.${index}.CategorieTemplateID` as const)}
-                  className="hidden"
-                />
+              <div className="col-sm-1">
+                <div className="form-control-static text-right">
+                  <span className="visible-xs-inline">Weging: </span>
+                  {field.Weging}
+                </div>
+              </div>
+              <div className="col-sm-1">
+                <div className="form-control-static text-right">
+                  <span className="visible-xs-inline">Totaal: </span>
+                  <CategoryRatingTotal
+                    {...{ index, getValues, watch, setValue, control }}
+                    // weging={field.Weging}
+                  ></CategoryRatingTotal>
+                  <input
+                    {...register(`ratings.${index}.VisitatieBeoordelingCategorieID` as const)}
+                    className="hidden"
+                  />
+                  <input
+                    {...register(`ratings.${index}.VisitatieID` as const)}
+                    className="hidden"
+                  />
+                  <input
+                    {...register(`ratings.${index}.CategorieNaam` as const)}
+                    className="hidden"
+                  />
+                  <input {...register(`ratings.${index}.Weging` as const)} className="hidden" />
+                  <input
+                    {...register(`ratings.${index}.TotaalPunten` as const)}
+                    className="hidden"
+                  />
+                  <input {...register(`ratings.${index}.Cijfer` as const)} className="hidden" />
+                  <input {...register(`ratings.${index}.Versie` as const)} className="hidden" />
+                  <input {...register(`ratings.${index}.VanafDatum` as const)} className="hidden" />
+                  <input
+                    {...register(`ratings.${index}.CategorieTemplateID` as const)}
+                    className="hidden"
+                  />
+                </div>
               </div>
             </div>
           </div>

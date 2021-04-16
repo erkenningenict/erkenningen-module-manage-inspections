@@ -11,21 +11,6 @@ const RatingQuestion: React.FC<{
     textQuestions: IQuestionType[];
     ratings: VisitatieBeoordelingCategorieInput[];
   }>;
-  //   register: any;
-  //   errors: DeepMap<
-  //     {
-  //       textQuestions: IQuestionType[];
-  //       ratings: VisitatieBeoordelingCategorieInput[];
-  //     },
-  //     FieldError
-  //   >;
-  //   fields: FieldArrayWithId<
-  //     {
-  //       vragen: VisitatieBeoordelingCategorieVraagInput[];
-  //     },
-  //     'vragen',
-  //     'id'
-  //   >[];
   nestIndex: number;
   control: any;
   getValues: any;
@@ -33,56 +18,11 @@ const RatingQuestion: React.FC<{
   errors: any;
   watch: any;
 }> = ({ register, control, nestIndex, getValues, setValue, watch, errors }) => {
-  // <{
-  //     Vragen: VisitatieBeoordelingCategorieVraagInput[];
-  //   }>
   const { fields: questions } = useFieldArray({
     name: `ratings.${nestIndex}.Vragen` as 'ratings.0.Vragen',
     control,
     keyName: 'VisitatieBeoordelingCategorieVraagID',
   });
-  // console.log('#DH# errors', errors);
-  // const isBetween0and10 = (val: string): boolean => {
-  //   return /^\d{1,1}$|^10$/.test(val);
-  // };
-
-  // const catQ = useWatch({ name: `ratings[${nestIndex}].Vragen`, control });
-  // console.log('#DH# catQ', catQ);
-
-  // const categoryQuestions: any[] = watch(`ratings.${nestIndex}.Vragen`);
-  // useEffect(() => {
-  //   const categoryTotal: number = categoryQuestions.reduce(
-  //     (total: number, qA: VisitatieBeoordelingCategorieVraagInput, index: number) => {
-  //       const totalQ = (qA.Cijfer || 0) * qA.Weging;
-  //       setValue(
-  //         `ratings.${nestIndex}.Vragen.${index}.TotaalPunten` as const,
-  //         parseFloat(totalQ.toFixed(1)),
-  //       );
-
-  //       return total + (totalQ || 0);
-  //     },
-  //     0,
-  //   );
-  //   const category = getValues(`ratings.${nestIndex}`);
-  //   // console.log('#DH# category Total', categoryTotal, category?.Weging);
-
-  //   setValue(`ratings.${nestIndex}.TotaalPunten` as const, parseFloat(categoryTotal.toFixed(1)));
-  //   setValue(
-  //     `ratings.${nestIndex}.Cijfer` as const,
-  //     parseFloat(((categoryTotal / category?.Weging) * 10).toFixed(2)) || 0,
-  //   );
-  // }, [categoryQuestions, nestIndex]);
-  // }, [getValues(`ratings.${nestIndex}.Vragen`), 1]);
-  // console.log('#DH# watcher', watcher);
-
-  // useEffect(() => {
-  //   register(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const);
-  // }, [register]);
-
-  // const handleRatingChange = (rating: number, index: number) => {
-  //   console.log('#DH# rating', rating);
-  //   setValue(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, rating);
-  // };
 
   return (
     <>
@@ -127,9 +67,13 @@ const RatingQuestion: React.FC<{
               )}
             </div>
             <div className="col-sm-1">
-              <div className="form-control-static textRight">{(field as any).Weging}</div>
+              <div className="form-control-static text-right">
+                <span className="visible-xs-inline">Weging: </span>
+                {(field as any).Weging}
+              </div>
             </div>
-            <div className="col-sm-1 form-control-static textRight">
+            <div className="col-sm-1 form-control-static text-right">
+              <span className="visible-xs-inline">Totaal: </span>
               <RatingTotal
                 {...{ nestIndex, index, getValues, watch, setValue, control }}
                 weging={parseInt((field as any).Weging, 10)}

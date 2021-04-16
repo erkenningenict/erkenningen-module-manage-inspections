@@ -11,7 +11,13 @@ import * as serviceWorker from './serviceWorker';
 
 import './index.scss';
 
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({
+  typePolicies: {
+    DiscussieVisitatie: {
+      keyFields: ['DiscussieVisitatieID'],
+    },
+  },
+});
 
 const client = new ApolloClient({
   link: new HttpLink({

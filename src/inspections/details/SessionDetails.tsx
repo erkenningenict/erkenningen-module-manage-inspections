@@ -39,8 +39,9 @@ const SessionDetails: React.FC<{
         <FormStaticItem label="Adres lokatie">
           {props.sessie?.Lokatie?.Contactgegevens.DisplayAddress}
         </FormStaticItem>
-        <FormStaticItem label="Datum">{toDutchDate(props.sessie?.Datum)}</FormStaticItem>
-        <FormStaticItem label="Begin/eindtijd">
+        <FormStaticItem label="Datum en tijd">
+          {toDutchDate(props.sessie?.Datum)}
+          {' van '}
           {new Date(props.sessie?.DatumBegintijd).toLocaleTimeString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit',
@@ -51,8 +52,9 @@ const SessionDetails: React.FC<{
             minute: '2-digit',
           })}
         </FormStaticItem>
-        <FormStaticItem label="Aanbodcode">{props.sessie?.Cursus?.VakID}</FormStaticItem>
-        <FormStaticItem label="Bijeenkomstcode">{props.sessie?.Cursus?.CursusID}</FormStaticItem>
+        <FormStaticItem label="Aanbod/bijeenkomst">
+          {props.sessie?.Cursus?.VakID} {props.sessie?.Cursus?.CursusID}
+        </FormStaticItem>
         <FormStaticItem label="Titel">{props.sessie?.Cursus?.Titel}</FormStaticItem>
         {showAll && (
           <>

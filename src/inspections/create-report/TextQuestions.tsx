@@ -1,6 +1,6 @@
 import React from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
-import { UseFormRegister, DeepMap, FieldError, FieldArrayWithId } from 'react-hook-form';
+import { UseFormRegister, DeepMap, FieldError, useFieldArray } from 'react-hook-form';
 import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
 import { IQuestionType } from '../../types/text-questions';
 
@@ -16,20 +16,12 @@ const TextQuestions: React.FC<{
     },
     FieldError
   >;
-  fields: FieldArrayWithId<
-    {
-      textQuestions: IQuestionType[];
-      ratings: VisitatieBeoordelingCategorieInput[];
-    },
-    'textQuestions',
-    'id'
-  >[];
-}> = ({ register, errors, fields }) => {
-  //   const {
-  //     register,
-  //     formState: { errors },
-  //   } = useForm();
-  //   const { fields } = useFieldArray({ name: 'textQuestions' });
+  control: any;
+}> = ({ register, errors, control }) => {
+  const { fields } = useFieldArray({
+    name: 'textQuestions' as `textQuestions`,
+    control,
+  });
   return (
     <>
       {fields?.map((field, index) => (
@@ -39,7 +31,7 @@ const TextQuestions: React.FC<{
           }`}
           key={field.id}
         >
-          <label className="control-label col-sm-4">{field.question}</label>
+          <label className="control-label col-sm-4">{(field as any).question}</label>
           <div className="col-sm-8">
             <input
               {...register(`textQuestions.${index}.question` as `textQuestions.0.question`)}
@@ -47,8 +39,7 @@ const TextQuestions: React.FC<{
             />
             <TextareaAutosize
               className="form-control"
-              key={field.id}
-              placeholder={`${field.question}`}
+              placeholder={`${(field as any).question}`}
               {...register(`textQuestions.${index}.answer` as `textQuestions.0.answer`)}
             />
             {errors?.textQuestions && errors?.textQuestions[index]?.answer && (

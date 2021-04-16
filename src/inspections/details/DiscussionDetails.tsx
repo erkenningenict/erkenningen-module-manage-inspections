@@ -99,7 +99,10 @@ const DiscussionDetails: React.FC<{
       <Panel title="Discussie rond de inspectie" doNotIncludeBody={true}>
         {props.alloNewDiscussion && (
           <form className="form form-horizontal" onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-group" style={{ marginTop: '15px' }}>
+            <div
+              className={`form-group ${errors.comment ? 'has-error' : ''}`}
+              style={{ marginTop: '15px' }}
+            >
               <label className="control-label col-sm-3">Commentaar</label>
               <div className="col-sm-9">
                 <TextareaAutosize
@@ -107,7 +110,7 @@ const DiscussionDetails: React.FC<{
                   {...register('comment')}
                   placeholder="Voeg uw commentaar toe"
                 />
-                {errors.comment && <span role="alert">{errors.comment.message}</span>}
+                {errors.comment && <span className="help-block">{errors.comment.message}</span>}
               </div>
             </div>
             <div className="form-group">

@@ -24,6 +24,19 @@ body .p-datatable .p-datatable-tbody button {
   text-align: right;
 }
 
+@media (max-width: 767px) {
+  .text-right {
+    text-align: left;
+  }
+}
+
+.sticky {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 100;
+}
+
 /* The slider itself */
 .slider {
   margin: 11px 0;

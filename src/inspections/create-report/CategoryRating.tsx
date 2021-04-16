@@ -6,7 +6,8 @@ const CategoryRating: React.FC<{
   control: any;
 }> = ({ index, control }) => {
   const c = useWatch({ control, name: `ratings.${index}` });
-  return <div>{c?.Cijfer}</div>;
+
+  return <span>{c?.Cijfer}</span>;
 };
 
 export default CategoryRating;
