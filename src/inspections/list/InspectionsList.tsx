@@ -217,7 +217,7 @@ const InspectionsList: React.FC<unknown> = () => {
               title: [pagination.title, yup.string().max(255)],
               status: [
                 pagination.status ? pagination.status : null,
-                yup.string().max(15).nullable(),
+                yup.string().max(50).nullable(),
               ],
               from: [pagination.from ? new Date(pagination.from) : null, yup.date().nullable()],
               to: [pagination.to ? new Date(pagination.to) : null, yup.date().nullable()],
@@ -250,6 +250,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       label={'Titel'}
                       labelClassNames={'col-sm-4'}
                       formControlClassName="col-sm-8"
+                      placeholder="Zoek op deel van de titel"
                     />
                     <FormSelect
                       name={'status'}
@@ -277,6 +278,7 @@ const InspectionsList: React.FC<unknown> = () => {
                     <FormCalendar
                       name={'from'}
                       label={'Datum inspectie van'}
+                      placeholder="Inspectie datum van"
                       showButtonBar={true}
                       labelClassNames={'col-sm-4'}
                       formControlClassName="col-sm-8"
@@ -284,6 +286,7 @@ const InspectionsList: React.FC<unknown> = () => {
                     <FormCalendar
                       name={'to'}
                       label={'Datum inspectie tot/met'}
+                      placeholder="Inspectie datum tot/met"
                       showButtonBar={true}
                       labelClassNames={'col-sm-4'}
                       formControlClassName="col-sm-8"
@@ -297,7 +300,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       labelClassNames={'col-sm-4'}
                       formControlClassName={'col-sm-8 col-sm-offset-4'}
                     >
-                      <Button label={'Zoeken'} buttonType="submit" />
+                      <Button label={'Zoeken'} buttonType="submit" icon="fas fa-search" />
                     </FormItem>
                   </div>
                 </div>
@@ -348,6 +351,7 @@ const InspectionsList: React.FC<unknown> = () => {
                   style={{ fontSize: '1rem' }}
                   tooltip="Bekijk details van deze inspectie"
                   type={'info'}
+                  title={`${row.VisitatieID}`}
                 />
               </>
             )}
@@ -380,14 +384,15 @@ const InspectionsList: React.FC<unknown> = () => {
             bodyClassName={styles.center}
             body={(row: Visitatie) => (
               <>
-                {row.Status === VisitatieStatusEnum.Ingepland && (
+                {(row.Status === VisitatieStatusEnum.Ingepland ||
+                  row.Status === VisitatieStatusEnum.RapportWordtOpgesteld) && (
                   <Button
                     label={''}
                     icon="fas fa-file-alt"
                     onClick={() =>
                       history.push(`/rapport-maken/${row.VisitatieID}/${row.SessieID}`)
                     }
-                    tooltip="Rapport maken"
+                    tooltip="Rapport maken of wijzigen"
                     style={{ fontSize: '1rem' }}
                   />
                 )}
@@ -399,7 +404,13 @@ const InspectionsList: React.FC<unknown> = () => {
             header={'Inspectie'}
             sortable={true}
             sortField={'DatumVisitatie'}
-            body={(row: any) => toDutchDate(row.DatumVisitatie)}
+            body={(row: any) => (
+              <>
+                {toDutchDate(row.DatumVisitatie)}
+                <br />
+                <span style={{ fontSize: '90%' }}>{row.Inspecteur.SortableFullName}</span>
+              </>
+            )}
             style={{ minWidth: '92px' }}
           />
           <Column
@@ -426,7 +437,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       <>
                         <Tooltip target=".negative" position={'top'} />
                         <i
-                          className="fas fa-check-circle negative"
+                          className="fas fa-times-circle negative"
                           style={{ color: 'red' }}
                           data-pr-tooltip="Negatief"
                         ></i>
@@ -436,7 +447,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       <>
                         <Tooltip target=".positive" position={'top'} />
                         <i
-                          className="fas fa-times-circle positive"
+                          className="fas fa-check-circle positive"
                           style={{ color: 'green' }}
                           data-pr-tooltip="Positief"
                         ></i>
@@ -478,16 +489,34 @@ const InspectionsList: React.FC<unknown> = () => {
             header={''}
             sortable={false}
             body={(row: any) =>
-              (row.Status === 'Ingepland' && (
+              (row.Status === VisitatieStatusEnum.Ingepland && (
                 <>
                   <Tooltip target=".planned" position={'top'} />
-                  <i className="fas fa-calendar-day planned" data-pr-tooltip="Ingepland"></i>
+                  <i
+                    className="fas fa-calendar-day planned"
+                    style={{ color: 'orange' }}
+                    data-pr-tooltip="Ingepland"
+                  ></i>
                 </>
               )) ||
-              (row.Status === 'Ingediend' && (
+              (row.Status === VisitatieStatusEnum.RapportWordtOpgesteld && (
+                <>
+                  <Tooltip target=".reportInProgress" position={'top'} />
+                  <i
+                    className="fas fa-calendar-day reportInProgress"
+                    style={{ color: 'blue' }}
+                    data-pr-tooltip="Rapport wordt opgesteld..."
+                  ></i>
+                </>
+              )) ||
+              (row.Status === VisitatieStatusEnum.Ingediend && (
                 <>
                   <Tooltip target=".submitted" position={'top'} />
-                  <i className="fas fa-file-signature submitted" data-pr-tooltip="Ingediend"></i>
+                  <i
+                    className="fas fa-file-signature submitted"
+                    style={{ color: 'green' }}
+                    data-pr-tooltip="Ingediend"
+                  ></i>
                 </>
               ))
             }
@@ -501,9 +530,9 @@ const InspectionsList: React.FC<unknown> = () => {
                 <div>
                   {row.LastChangeDate
                     ? toDutchDate(row.LastChangeDate, { includeTime: true })
-                    : toDutchDate(row.DatumRapport, { includeTime: true })}
+                    : toDutchDate(row.DatumRapport)}
                 </div>
-                <div className="">{row.LastChangeBy}</div>
+                <div style={{ fontSize: '90%' }}>{row.LastChangeBy}</div>
               </>
             )}
           />

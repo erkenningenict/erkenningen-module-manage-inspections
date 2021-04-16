@@ -25,6 +25,9 @@ query getVisitations($input: visitationsInput!) {
         CursusCode
         Titel
       }
+      Inspecteur {
+        SortableFullName
+      }
       IsDeclarationPossible
       IsDeclarationSubmitted
       LastChangeBy

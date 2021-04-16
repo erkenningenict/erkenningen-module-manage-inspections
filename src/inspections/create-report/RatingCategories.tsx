@@ -44,7 +44,8 @@ const RatingCategories: React.FC<{
     'id'
   >[];
   watch: any;
-}> = ({ register, control, watch, getValues, setValue, errors }) => {
+  isReadOnly: boolean;
+}> = ({ register, control, watch, getValues, setValue, errors, isReadOnly }) => {
   const { fields } = useFieldArray<{ ratings: VisitatieBeoordelingCategorieInput[] }>({
     control,
     name: 'ratings' as `ratings`,
@@ -120,6 +121,7 @@ const RatingCategories: React.FC<{
           <RatingQuestion
             key={field.id}
             nestIndex={index}
+            isReadOnly={isReadOnly}
             {...{ control, register, watch, getValues, setValue, errors }}
           ></RatingQuestion>
         </div>

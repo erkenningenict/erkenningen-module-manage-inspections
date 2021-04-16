@@ -154,11 +154,15 @@ const DiscussionDetails: React.FC<{
                   <div className="dateTime">
                     {toDutchDate(d.DatumTijdUTC, { includeTime: true })}
                   </div>
-                  <div className="">{d?.Persoon?.SortableFullName}</div>
+                  <div>{d?.Persoon?.SortableFullName}</div>
                   <div className="source">
                     {d?.IsAuteurInspecteur ? 'Inspecteur' : 'Kennisaanbieder'}
                   </div>
                 </Col>
+                <div
+                  className="visible-xs-block"
+                  style={{ borderTop: '1px solid #ccc', margin: '5px 0' }}
+                ></div>
                 <Col size="col-sm-9">{d?.Commentaar}</Col>
               </Row>
             ))}

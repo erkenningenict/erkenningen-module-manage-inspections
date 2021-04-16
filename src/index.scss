@@ -9,6 +9,9 @@ body .p-datatable .p-datatable-tbody > tr > td {
 body .p-datatable .p-datatable-tbody button {
   font-size: 1.3rem;
 }
+.p-paginator .p-dropdown {
+  height: auto !important;
+}
 
 .mb-1 {
   margin-bottom: 1em;

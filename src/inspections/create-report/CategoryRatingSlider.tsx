@@ -6,7 +6,8 @@ const CategoryRatingSlider: React.FC<{
   setValue: any;
   control: any;
   watch: any;
-}> = ({ watch, nestIndex, setValue, index }) => {
+  isReadOnly: boolean;
+}> = ({ watch, nestIndex, setValue, index, isReadOnly }) => {
   const c = watch(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const);
 
   const handleRatingChange = (e: any) =>
@@ -25,6 +26,7 @@ const CategoryRatingSlider: React.FC<{
         }}
         value={c}
         onChange={handleRatingChange}
+        disabled={isReadOnly}
         min={0}
         max={10}
       ></input>

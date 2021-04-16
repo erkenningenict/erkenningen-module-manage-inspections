@@ -17,7 +17,8 @@ const RatingQuestion: React.FC<{
   setValue: any;
   errors: any;
   watch: any;
-}> = ({ register, control, nestIndex, getValues, setValue, watch, errors }) => {
+  isReadOnly: boolean;
+}> = ({ register, control, nestIndex, getValues, setValue, watch, errors, isReadOnly }) => {
   const { fields: questions } = useFieldArray({
     name: `ratings.${nestIndex}.Vragen` as 'ratings.0.Vragen',
     control,
@@ -48,6 +49,7 @@ const RatingQuestion: React.FC<{
             <div className="col-sm-3" key={field.VisitatieBeoordelingCategorieVraagID}>
               <CategoryRatingSlider
                 {...{ register, control, watch, getValues, nestIndex, index, setValue }}
+                isReadOnly={isReadOnly}
               ></CategoryRatingSlider>
               <input
                 key={field.VisitatieBeoordelingCategorieVraagID}
@@ -59,6 +61,7 @@ const RatingQuestion: React.FC<{
                 style={{ position: 'relative', zIndex: 0 }}
                 min={0}
                 max={10}
+                readOnly={isReadOnly}
               ></input>
               {ratingError && (
                 <span className="help-block">
@@ -83,6 +86,7 @@ const RatingQuestion: React.FC<{
               <TextareaAutosize
                 className="form-control"
                 key={(field as any).id}
+                readOnly={isReadOnly}
                 {...register(`ratings.${nestIndex}.Vragen.${index}.Toelichting` as const)}
                 placeholder={`Toelichting ${(field as any).Naam.toLowerCase()}`}
               ></TextareaAutosize>

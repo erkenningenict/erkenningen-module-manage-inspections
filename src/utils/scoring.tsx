@@ -26,7 +26,7 @@ export function getScores(
     goalTotal += doelstellingBehaald?.TotaalPunten || 0;
     const voorgenomenInhoudBehandeld = findQuestion(
       categoryUitvoering,
-      'Voorgenomen inhoud behandeld',
+      'Voorgenomen inhoud behandeld, event. incl thuisopdracht',
     );
     goalTotal += voorgenomenInhoudBehandeld?.TotaalPunten || 0;
   }

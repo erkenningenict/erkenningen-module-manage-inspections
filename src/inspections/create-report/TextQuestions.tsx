@@ -17,7 +17,8 @@ const TextQuestions: React.FC<{
     FieldError
   >;
   control: any;
-}> = ({ register, errors, control }) => {
+  isReadOnly: boolean;
+}> = ({ register, errors, control, isReadOnly }) => {
   const { fields } = useFieldArray({
     name: 'textQuestions' as `textQuestions`,
     control,
@@ -39,6 +40,7 @@ const TextQuestions: React.FC<{
             />
             <TextareaAutosize
               className="form-control"
+              readOnly={isReadOnly}
               placeholder={`${(field as any).question}`}
               {...register(`textQuestions.${index}.answer` as `textQuestions.0.answer`)}
             />

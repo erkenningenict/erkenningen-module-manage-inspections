@@ -67,7 +67,13 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
       newQuestion(catId1, uuidv4(), 1001, 'Beginsituatie deelnemers nagegaan', 5),
       newQuestion(catId1, uuidv4(), 1002, 'Op- en aanmerkingen beoordelaar verwerkt', 7),
       newQuestion(catId1, uuidv4(), 1003, 'Doelstelling behaald', 13),
-      newQuestion(catId1, uuidv4(), 1004, 'Voorgenomen inhoud behandeld', 25),
+      newQuestion(
+        catId1,
+        uuidv4(),
+        1004,
+        'Voorgenomen inhoud behandeld, event. incl thuisopdracht',
+        25,
+      ),
     ]),
     newCategory(catId2, 'Aanpak', 30, [
       newQuestion(catId2, uuidv4(), 2001, 'Werkwijze als gepland toegepast', 10),
@@ -78,7 +84,7 @@ export function getRatingsTemplate(visitatieId: number): VisitatieBeoordelingCat
       newQuestion(catId3, uuidv4(), 3001, 'Samenvatting uitgereikt', 5),
       newQuestion(catId3, uuidv4(), 3002, 'Inhoudelijk en organisatorisch geëvalueerd', 5),
       newQuestion(catId3, uuidv4(), 3003, 'Groepsgrootte als gepland', 5),
-      newQuestion(catId3, uuidv4(), 3004, 'Localiteit adequaat', 5),
+      newQuestion(catId3, uuidv4(), 3004, 'Localiteit en (digi)techniek adequaat', 5),
     ]),
   ];
 }

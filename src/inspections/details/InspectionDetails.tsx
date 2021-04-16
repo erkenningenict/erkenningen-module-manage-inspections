@@ -4,11 +4,15 @@ import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 
-import { useGetSessionQuery, useGetVisitationQuery } from '../../generated/graphql';
+import {
+  useGetSessionQuery,
+  useGetVisitationQuery,
+  VisitatieStatusEnum,
+} from '../../generated/graphql';
 import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
 import { Row } from '@erkenningen/ui/layout/row';
 import { Col } from '@erkenningen/ui/layout/col';
-import { toDutchDate } from '@erkenningen/ui/utils';
+import { toDutchDate, formatCapitalEnum } from '@erkenningen/ui/utils';
 import { FormStaticItem } from '../../components/FormStaticItem';
 import './InspectionDetails.css';
 import SessionDetails from './SessionDetails';
@@ -17,8 +21,8 @@ import { add, isAfter } from 'date-fns';
 import { nrOfMonthsAfterWhichCommentsAreNotAllowed } from '../../utils/time';
 import PrintButton from '../../components/PrintButton';
 import { Alert } from '@erkenningen/ui/components/alert';
-import CreateReport from '../create-report/CreateReport';
-import { useAuth } from '../../shared/Auth';
+import EditReport from '../create-report/EditReport';
+import { hasRole, Roles, useAuth } from '../../shared/Auth';
 
 const InspectionDetails: React.FC<unknown> = () => {
   const { showGrowl } = useGrowlContext();
@@ -88,17 +92,23 @@ const InspectionDetails: React.FC<unknown> = () => {
       <div id="printContainer">
         <Row>
           <Col size={'col-md-6'}>
-            <Panel title="Informatie over de inspectie" className="form-horizontal">
-              <FormStaticItem label="Status">{visitatie?.Status}</FormStaticItem>
+            <Panel
+              title="Informatie over de inspectie"
+              className="form-horizontal"
+              doNotIncludeBody={true}
+            >
+              <FormStaticItem label="Status">
+                {formatCapitalEnum(visitatie?.Status, 'Onbekende status')}
+              </FormStaticItem>
               <FormStaticItem label="Inspecteur">
                 {visitatie?.Inspecteur?.SortableFullName}
               </FormStaticItem>
               <FormStaticItem label="Inspectiedatum">
                 {toDutchDate(visitatie?.DatumVisitatie)}
               </FormStaticItem>
-              {!visitatie?.DatumRapport && (
+              {visitatie?.Status !== VisitatieStatusEnum.Ingediend && (
                 <div>
-                  <Alert type="info">Er is nog geen rapport gemaakt.</Alert>
+                  <Alert type="info">Er is nog geen (definitief) rapport gemaakt.</Alert>
                   {/* {auth.my?.Persoon?.PersoonID === visitatie?.PersoonID && (
                     <Button
                       buttonType="button"
@@ -108,15 +118,13 @@ const InspectionDetails: React.FC<unknown> = () => {
                   )} */}
                 </div>
               )}
-              {visitatie?.DatumRapport && (
+              {visitatie?.Status === VisitatieStatusEnum.Ingediend && (
                 <>
                   <FormStaticItem label="Rapportdatum">
                     {toDutchDate(visitatie?.DatumRapport)}
                   </FormStaticItem>
                   <FormStaticItem label="Rapportcijfer">
-                    {visitatie?.Rapportcijfer === 0
-                      ? 'Nog geen rapport gemaakt'
-                      : visitatie?.Rapportcijfer}{' '}
+                    {visitatie?.Rapportcijfer}{' '}
                     {visitatie?.VolgensIntentieAanbod === false && (
                       <>
                         <i
@@ -128,65 +136,62 @@ const InspectionDetails: React.FC<unknown> = () => {
                       </>
                     )}
                   </FormStaticItem>
+                  <FormStaticItem
+                    label="Rapporttekst"
+                    fieldClassNames="col-sm-8 form-control-static reportText"
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          visitatie?.Rapport?.replace('<p>', '')
+                            .replace('</p>', '')
+                            .replace(/<BR><BR>/g, '')
+                            .replace(
+                              /<BR>----------------------------------------------------------/g,
+                              '<br class="line"/>',
+                            )
+                            .replace(/<br \/>/g, '<br class="line"/>')
+                            .replace(/<BR>/g, '<br class="line"/>')
+                            .replace(
+                              /----------------------------------------------------------/g,
+                              '<br class="line"/>',
+                            )
+                            .replace(
+                              'Is de doelstelling bereikt: ',
+                              '<div class="question">Is de doelstelling bereikt: </div>',
+                            )
+                            .replace(
+                              'Aantal deelnemers: ',
+                              '<div class="question">Aantal deelnemers: </div>',
+                            )
+                            .replace(
+                              'Docenten/inleiders: ',
+                              '<div class="question">Docenten/inleiders: </div>',
+                            )
+                            .replace(
+                              'Lokatie in relatie tot doelstelling: ',
+                              '<div class="question">Lokatie in relatie tot doelstelling: </div>',
+                            )
+                            .replace(
+                              'Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: ',
+                              '<div class="question">Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: </div>',
+                            )
+                            .replace(
+                              'Hulpmiddelen en toepassingswijze: ',
+                              '<div class="question">Hulpmiddelen en toepassingswijze: </div>',
+                            )
+                            .replace(
+                              'Kwaliteit van samenvatting: ',
+                              '<div class="question">Kwaliteit van samenvatting: </div>',
+                            )
+                            .replace(
+                              'Aanvullende opmerkingen: ',
+                              '<div class="question">Aanvullende opmerkingen: </div>',
+                            ) || '',
+                      }}
+                    ></div>
+                  </FormStaticItem>
                 </>
-              )}
-
-              {visitatie?.Rapport && (
-                <FormStaticItem
-                  label="Rapporttekst"
-                  fieldClassNames="col-sm-8 form-control-static reportText"
-                >
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        visitatie?.Rapport?.replace('<p>', '')
-                          .replace('</p>', '')
-                          .replace(/<BR><BR>/g, '')
-                          .replace(`SLASH`, '/')
-                          .replace(
-                            /<BR>----------------------------------------------------------/g,
-                            '<br/>',
-                          )
-                          .replace(/<BR>/g, '<br/>')
-                          .replace(
-                            /----------------------------------------------------------/g,
-                            '<br/>',
-                          )
-                          .replace(
-                            'Is de doelstelling bereikt: ',
-                            '<span class="question">Is de doelstelling bereikt: </span>',
-                          )
-                          .replace(
-                            'Aantal deelnemers: ',
-                            '<span class="question">Aantal deelnemers: </span>',
-                          )
-                          .replace(
-                            'Docenten/inleiders: ',
-                            '<span class="question">Docenten/inleiders: </span>',
-                          )
-                          .replace(
-                            'Lokatie in relatie tot doelstelling: ',
-                            '<span class="question">Lokatie in relatie tot doelstelling: </span>',
-                          )
-                          .replace(
-                            'Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: ',
-                            '<span class="question">Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: </span>',
-                          )
-                          .replace(
-                            'Hulpmiddelen en toepassingswijze: ',
-                            '<span class="question">Hulpmiddelen en toepassingswijze: </span>',
-                          )
-                          .replace(
-                            'Kwaliteit van samenvatting: ',
-                            '<span class="question">Aanvullende opmerkingen: </span>',
-                          )
-                          .replace(
-                            'Aanvullende opmerkingen: ',
-                            '<span class="question">Aanvullende opmerkingen: </span>',
-                          ) || '',
-                    }}
-                  ></div>
-                </FormStaticItem>
               )}
             </Panel>
           </Col>
@@ -200,16 +205,17 @@ const InspectionDetails: React.FC<unknown> = () => {
             )}
           </Col>
         </Row>
-        {isCreateReportRoute !== null && auth.my?.Persoon?.PersoonID === visitatie?.PersoonID && (
+        {(auth.my?.Persoon?.PersoonID === visitatie?.PersoonID ||
+          hasRole(Roles.Rector, auth.my?.Roles)) && (
           <Row>
             <Col>
-              <CreateReport
+              <EditReport
                 visitatieId={+visitatieId}
                 status={visitatie?.Status}
                 rapportTemplateJson={visitatie?.RapportTemplateJson}
                 vragenJson={visitatie?.VragenJson}
                 categories={visitatie?.VisitatieBeoordelingCategorieen}
-              ></CreateReport>
+              ></EditReport>
             </Col>
           </Row>
         )}
