@@ -211,7 +211,7 @@ const CreateReport: React.FC<{
       },
     });
   };
-  console.log('#DH# defaultValues', defaultValues);
+  // console.log('#DH# defaultValues', defaultValues);
 
   return (
     <Panel

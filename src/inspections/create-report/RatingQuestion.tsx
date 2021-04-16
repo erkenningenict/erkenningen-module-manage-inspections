@@ -39,9 +39,7 @@ const RatingQuestion: React.FC<{
   // <{
   //     Vragen: VisitatieBeoordelingCategorieVraagInput[];
   //   }>
-  const { fields: questions } = useFieldArray<{
-    Vragen: VisitatieBeoordelingCategorieVraagInput[];
-  }>({
+  const { fields: questions } = useFieldArray({
     name: `ratings.${nestIndex}.Vragen` as 'ratings.0.Vragen',
     control,
     keyName: 'VisitatieBeoordelingCategorieVraagID',
@@ -109,7 +107,7 @@ const RatingQuestion: React.FC<{
             key={field.VisitatieBeoordelingCategorieVraagID}
             className={`form-group ${ratingError ? 'has-error' : ''}`}
           >
-            <label className={`control-label col-sm-4 `}>{field.Naam}</label>
+            <label className={`control-label col-sm-4 `}>{(field as any).Naam}</label>
             <div className="col-sm-3" key={field.VisitatieBeoordelingCategorieVraagID}>
               <CategoryRatingSlider
                 {...{ register, control, watch, getValues, nestIndex, index, setValue }}
@@ -132,20 +130,20 @@ const RatingQuestion: React.FC<{
               )}
             </div>
             <div className="col-sm-1">
-              <div className="form-control-static textRight">{field.Weging}</div>
+              <div className="form-control-static textRight">{(field as any).Weging}</div>
             </div>
             <div className="col-sm-1 form-control-static textRight">
               <RatingTotal
                 {...{ nestIndex, index, getValues, watch, setValue, control }}
-                weging={parseInt(field.Weging, 10)}
+                weging={parseInt((field as any).Weging, 10)}
               ></RatingTotal>
             </div>
             <div className="col-sm-3">
               <TextareaAutosize
                 className="form-control"
-                key={field.id}
+                key={(field as any).id}
                 {...register(`ratings.${nestIndex}.Vragen.${index}.Toelichting` as const)}
-                placeholder={`Toelichting ${field.Naam.toLowerCase()}`}
+                placeholder={`Toelichting ${(field as any).Naam.toLowerCase()}`}
               ></TextareaAutosize>
               {errors &&
                 errors?.ratings &&
