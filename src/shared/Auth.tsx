@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { DeepPartial } from 'ts-essentials';
-
-import { useGetMyQuery, My } from 'generated/graphql';
+import { My, useGetMyQuery } from '../generated/graphql';
 
 export enum Roles {
   Beoordelaar = 'Beoordelaar',

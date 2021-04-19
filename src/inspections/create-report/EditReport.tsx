@@ -40,6 +40,8 @@ const EditReport: React.FC<{
   rapportTemplateJson?: string;
   vragenJson?: string;
   categories?: VisitatieBeoordelingCategorieFieldsFragment[];
+  isRector: boolean;
+  isAssignedInspector: boolean;
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
 
@@ -219,6 +221,9 @@ const EditReport: React.FC<{
   };
 
   // console.log('#DH# defaultValues', defaultValues);
+  const isReadOnly =
+    props.status === VisitatieStatusEnum.Ingediend ||
+    (!props.isRector && !props.isAssignedInspector);
 
   return (
     <Panel
@@ -242,7 +247,7 @@ const EditReport: React.FC<{
             {/* ERRORS: {JSON.stringify(errors)} */}
             <TextQuestions
               {...{ control, register, errors }}
-              isReadOnly={props.status === VisitatieStatusEnum.Ingediend}
+              isReadOnly={isReadOnly}
             ></TextQuestions>
             <div className="panel-body">
               <h4>Cijfers</h4>
@@ -250,7 +255,7 @@ const EditReport: React.FC<{
             <RatingCategories
               {...{ control, register, watch, defaultValues, getValues, setValue, errors }}
               fields={ratingFields}
-              isReadOnly={props.status === VisitatieStatusEnum.Ingediend}
+              isReadOnly={isReadOnly}
             ></RatingCategories>
             <ReportTotal numberRatings={ratings}></ReportTotal>
             {props.status !== VisitatieStatusEnum.Ingediend && (

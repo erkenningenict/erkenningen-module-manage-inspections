@@ -4,11 +4,7 @@ import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 
-import {
-  useGetSessionQuery,
-  useGetVisitationQuery,
-  VisitatieStatusEnum,
-} from '../../generated/graphql';
+import { useGetVisitationQuery, VisitatieStatusEnum } from '../../generated/graphql';
 import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
 import { Row } from '@erkenningen/ui/layout/row';
 import { Col } from '@erkenningen/ui/layout/col';
@@ -23,31 +19,20 @@ import PrintButton from '../../components/PrintButton';
 import { Alert } from '@erkenningen/ui/components/alert';
 import EditReport from '../create-report/EditReport';
 import { hasRole, Roles, useAuth } from '../../shared/Auth';
+import ParseReportText from './ParseReportText';
 
 const InspectionDetails: React.FC<unknown> = () => {
   const { showGrowl } = useGrowlContext();
   const auth = useAuth();
-  const history = useHistory();
+  const history = useHistory<any>();
   const isCreateReportRoute = useRouteMatch('/rapport-maken/:visitatieId/:sessieId');
 
   const { visitatieId: visitatieId, sessieId: sessieId } = useParams<any>();
+  console.log('#DH# params', visitatieId, sessieId);
 
   const { loading: inspectionLoading, data: inspection } = useGetVisitationQuery({
     // fetchPolicy: 'cache-and-network',
     variables: { input: { visitatieId: +visitatieId } },
-    onError() {
-      showGrowl({
-        severity: 'error',
-        summary: 'Inspectie ophalen',
-        sticky: true,
-        detail: `Er is een fout opgetreden bij het ophalen van de inspectie. Controleer uw invoer of neem contact met ons op.`,
-      });
-    },
-  });
-
-  const { loading: sessionLoading, data: session } = useGetSessionQuery({
-    fetchPolicy: 'network-only',
-    variables: { sessieId: +sessieId },
     onError() {
       showGrowl({
         severity: 'error',
@@ -67,6 +52,11 @@ const InspectionDetails: React.FC<unknown> = () => {
   }
 
   const visitatie = inspection?.Visitation;
+  console.log('#DH# Vistatie', inspection?.Visitation?.PersoonID);
+  console.log('#DH# My?', auth.my?.Persoon?.PersoonID);
+  const isAssignedInspector = auth.my?.Persoon?.PersoonID === visitatie?.PersoonID;
+  const hasData = visitatie?.VisitatieBeoordelingCategorieen?.length !== 0;
+  const isRector = hasRole(Roles.Rector, auth?.my?.Roles);
 
   return (
     <>
@@ -140,73 +130,17 @@ const InspectionDetails: React.FC<unknown> = () => {
                     label="Rapporttekst"
                     fieldClassNames="col-sm-8 form-control-static reportText"
                   >
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          visitatie?.Rapport?.replace('<p>', '')
-                            .replace('</p>', '')
-                            .replace(/<BR><BR>/g, '')
-                            .replace(
-                              /<BR>----------------------------------------------------------/g,
-                              '<br class="line"/>',
-                            )
-                            .replace(/<br \/>/g, '<br class="line"/>')
-                            .replace(/<BR>/g, '<br class="line"/>')
-                            .replace(
-                              /----------------------------------------------------------/g,
-                              '<br class="line"/>',
-                            )
-                            .replace(
-                              'Is de doelstelling bereikt: ',
-                              '<div class="question">Is de doelstelling bereikt: </div>',
-                            )
-                            .replace(
-                              'Aantal deelnemers: ',
-                              '<div class="question">Aantal deelnemers: </div>',
-                            )
-                            .replace(
-                              'Docenten/inleiders: ',
-                              '<div class="question">Docenten/inleiders: </div>',
-                            )
-                            .replace(
-                              'Lokatie in relatie tot doelstelling: ',
-                              '<div class="question">Lokatie in relatie tot doelstelling: </div>',
-                            )
-                            .replace(
-                              'Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: ',
-                              '<div class="question">Wordt binnen de competentie gewerkt en worden de genoemde vaardigheden behandeld: </div>',
-                            )
-                            .replace(
-                              'Hulpmiddelen en toepassingswijze: ',
-                              '<div class="question">Hulpmiddelen en toepassingswijze: </div>',
-                            )
-                            .replace(
-                              'Kwaliteit van samenvatting: ',
-                              '<div class="question">Kwaliteit van samenvatting: </div>',
-                            )
-                            .replace(
-                              'Aanvullende opmerkingen: ',
-                              '<div class="question">Aanvullende opmerkingen: </div>',
-                            ) || '',
-                      }}
-                    ></div>
+                    <ParseReportText report={visitatie?.Rapport}></ParseReportText>
                   </FormStaticItem>
                 </>
               )}
             </Panel>
           </Col>
           <Col size="col-md-6">
-            {visitatie && (
-              <SessionDetails
-                sessie={session?.Sessie}
-                sessionLoading={sessionLoading}
-                showAll={isCreateReportRoute === null}
-              ></SessionDetails>
-            )}
+            {visitatie && <SessionDetails showAll={isCreateReportRoute === null}></SessionDetails>}
           </Col>
         </Row>
-        {(auth.my?.Persoon?.PersoonID === visitatie?.PersoonID ||
-          hasRole(Roles.Rector, auth.my?.Roles)) && (
+        {!(visitatie?.Status === VisitatieStatusEnum.Ingediend && !hasData) && (
           <Row>
             <Col>
               <EditReport
@@ -215,6 +149,8 @@ const InspectionDetails: React.FC<unknown> = () => {
                 rapportTemplateJson={visitatie?.RapportTemplateJson}
                 vragenJson={visitatie?.VragenJson}
                 categories={visitatie?.VisitatieBeoordelingCategorieen}
+                isAssignedInspector={isAssignedInspector}
+                isRector={isRector}
               ></EditReport>
             </Col>
           </Row>

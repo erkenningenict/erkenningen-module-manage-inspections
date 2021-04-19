@@ -61,7 +61,12 @@ const App: React.FC<unknown> = () => {
     return <Alert type="danger">U moet ingelogd zijn.</Alert>;
   }
 
-  if (!hasOneOfRoles([Roles.Rector, Roles.Inspecteur], auth.my?.Roles)) {
+  if (
+    !hasOneOfRoles(
+      [Roles.Rector, Roles.Inspecteur, Roles.Hoogleraar, Roles.Examinator],
+      auth.my?.Roles,
+    )
+  ) {
     return <Alert type="danger">U heeft geen toegang tot deze module.</Alert>;
   }
 

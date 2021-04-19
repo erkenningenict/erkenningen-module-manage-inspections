@@ -163,27 +163,6 @@ const InspectionsList: React.FC<unknown> = () => {
     },
   });
 
-  // const [deleteExam] = useDeleteExamMutation({
-  //   onCompleted() {
-  //     showGrowl({
-  //       severity: 'success',
-  //       summary: 'Examen verwijderd',
-  //       detail: 'Het examen is succesvol verwijderd.',
-  //     });
-  //     if (refetch) {
-  //       refetch();
-  //     }
-  //   },
-  //   onError(e) {
-  //     showGrowl({
-  //       severity: 'error',
-  //       summary: 'Examen niet verwijderd',
-  //       sticky: true,
-  //       detail: `Er is een fout opgetreden bij het verwijderen van het examen: ${e.message}`,
-  //     });
-  //   },
-  // });
-
   useEffect(() => {
     getInspections();
   }, [pagination.pageNumber, pagination.pageSize, pagination.direction, pagination.field]);
@@ -344,6 +323,7 @@ const InspectionsList: React.FC<unknown> = () => {
             bodyClassName={styles.center}
             body={(row: Visitatie) => (
               <>
+              {row.VisitatieID}
                 <Button
                   label={''}
                   icon="fas fa-info"

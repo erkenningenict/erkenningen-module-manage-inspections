@@ -3,19 +3,35 @@ import React, { useState } from 'react';
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 
-import { SessionInfoFragment } from '../../generated/graphql';
+import { useGetSessionQuery } from '../../generated/graphql';
 import { toDutchDate } from '@erkenningen/ui/utils';
 import { FormStaticItem } from '../../components/FormStaticItem';
 // import './InspectionDetails.css';
 import { Button } from '@erkenningen/ui/components/button';
+import { useGrowlContext } from '@erkenningen/ui/components/growl';
+import { useParams } from 'react-router-dom';
 
 const SessionDetails: React.FC<{
-  sessie?: SessionInfoFragment;
-  sessionLoading: boolean;
   showAll: boolean;
 }> = (props) => {
+  const { showGrowl } = useGrowlContext();
+  const { sessieId } = useParams<any>();
   const [showAll, setShowAll] = useState<boolean>(props.showAll);
-  if (props.sessionLoading) {
+
+  const { loading: sessionLoading, data: session } = useGetSessionQuery({
+    fetchPolicy: 'network-only',
+    variables: { sessieId: +sessieId },
+    onError() {
+      showGrowl({
+        severity: 'error',
+        summary: 'Inspectie ophalen',
+        sticky: true,
+        detail: `Er is een fout opgetreden bij het ophalen van de inspectie. Controleer uw invoer of neem contact met ons op.`,
+      });
+    },
+  });
+
+  if (sessionLoading) {
     return (
       <Panel title="Informatie over de bijeenkomst" className="form-horizontal">
         <Spinner text={'Gegevens laden...'} />
@@ -23,7 +39,7 @@ const SessionDetails: React.FC<{
     );
   }
 
-  const vak = props.sessie?.Cursus?.Vak;
+  const vak = session?.Sessie?.Cursus?.Vak;
 
   return (
     <>
@@ -33,33 +49,33 @@ const SessionDetails: React.FC<{
         doNotIncludeBody={true}
       >
         <FormStaticItem label="Type" data-testid="sessieType">
-          {props.sessie?.SessieType || 'Fysieke bijeenkomst op locatie'}
+          {session?.Sessie?.SessieType || 'Fysieke bijeenkomst op locatie'}
         </FormStaticItem>
-        <FormStaticItem label="Lokatie">{props.sessie?.Lokatie?.Naam}</FormStaticItem>
+        <FormStaticItem label="Lokatie">{session?.Sessie?.Lokatie?.Naam}</FormStaticItem>
         <FormStaticItem label="Adres lokatie">
-          {props.sessie?.Lokatie?.Contactgegevens.DisplayAddress}
+          {session?.Sessie?.Lokatie?.Contactgegevens.DisplayAddress}
         </FormStaticItem>
         <FormStaticItem label="Datum en tijd">
-          {toDutchDate(props.sessie?.Datum)}
+          {toDutchDate(session?.Sessie?.Datum)}
           {' van '}
-          {new Date(props.sessie?.DatumBegintijd).toLocaleTimeString('nl-NL', {
+          {new Date(session?.Sessie?.DatumBegintijd).toLocaleTimeString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit',
           })}
           {' - '}
-          {new Date(props.sessie?.DatumEindtijd).toLocaleTimeString('nl-NL', {
+          {new Date(session?.Sessie?.DatumEindtijd).toLocaleTimeString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit',
           })}
         </FormStaticItem>
         <FormStaticItem label="Aanbod/bijeenkomst">
-          {props.sessie?.Cursus?.VakID} {props.sessie?.Cursus?.CursusID}
+          {session?.Sessie?.Cursus?.VakID} {session?.Sessie?.Cursus?.CursusID}
         </FormStaticItem>
-        <FormStaticItem label="Titel">{props.sessie?.Cursus?.Titel}</FormStaticItem>
+        <FormStaticItem label="Titel">{session?.Sessie?.Cursus?.Titel}</FormStaticItem>
         {showAll && (
           <>
             <FormStaticItem label="Promotietekst">
-              {props.sessie?.Cursus?.Promotietekst}
+              {session?.Sessie?.Cursus?.Promotietekst}
             </FormStaticItem>
 
             <FormStaticItem label="Thema">{vak?.ThemaNaam}</FormStaticItem>
