@@ -40,7 +40,6 @@ type IMeta = {
 const EditReport: React.FC<{
   visitatieId: number;
   status?: VisitatieStatusEnum;
-  rapportTemplateJson?: string;
   vragenJson?: string;
   categories?: VisitatieBeoordelingCategorieFieldsFragment[];
   isRector: boolean;

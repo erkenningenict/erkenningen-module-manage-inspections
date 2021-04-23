@@ -21,12 +21,14 @@ import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import add from 'date-fns/add';
 
 import styles from './InspectionsList.module.scss';
-import Form from 'components/Form';
-import { FormCalendar, FormItem, FormSelect, FormText } from '@erkenningen/ui/components/form';
 import { isAfter } from 'date-fns';
 import { nrOfMonthsAfterWhichCommentsAreNotAllowed } from '../../utils/time';
 import { Row } from '@erkenningen/ui/layout/row';
 import { Col } from '@erkenningen/ui/layout/col';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Datepicker } from '@erkenningen/ui/components/datepicker';
+import { Select } from '@erkenningen/ui/components/select';
 
 type IPagination = {
   pageNumber: number;
@@ -44,7 +46,7 @@ type IFilter = {
   title?: string;
   from?: number;
   to?: number;
-  status?: VisitatieStatusEnum;
+  status?: VisitatieStatusEnum | 'Alles';
 };
 
 type IPaginationAndSort = IPagination & ISort & IFilter;
@@ -55,7 +57,6 @@ const InspectionsList: React.FC<unknown> = () => {
   const history = useHistory();
   const { search } = useLocation();
   const { showGrowl } = useGrowlContext();
-  // const confirm = useConfirm();
 
   const setQueryParam = (queryData: IPaginationAndSort) => {
     history.push({
@@ -63,7 +64,9 @@ const InspectionsList: React.FC<unknown> = () => {
         queryData.field
       }&direction=${queryData.direction}&courseCode=${queryData.courseCode}&title=${
         queryData.title
-      }&from=${queryData.from || ''}&to=${queryData.to || ''}`,
+      }&from=${queryData.from || ''}&to=${queryData.to || ''}&status=${
+        queryData.status || 'Alles'
+      }`,
     });
   };
 
@@ -137,6 +140,29 @@ const InspectionsList: React.FC<unknown> = () => {
 
   const [pagination, setPagination] = useState<IPaginationAndSort>(parseQueryParams());
 
+  const schema = yup.object().shape({
+    courseCode: yup.string().max(10),
+    title: yup.string().max(255),
+    status: yup.string().max(50).nullable(),
+    from: yup.date().nullable(),
+    to: yup.date().nullable(),
+  });
+
+  const defaultValues = {
+    courseCode: pagination.courseCode,
+    title: pagination.title,
+    status: pagination.status || null,
+    from: pagination.from ? new Date(pagination.from) : null,
+    to: pagination.to ? new Date(pagination.to) : null,
+  };
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isValid },
+  } = useForm({ mode: 'onChange', resolver: yupResolver(schema), defaultValues });
+
   const [getInspections, { loading, data, error }] = useGetVisitationsLazyQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
@@ -149,7 +175,7 @@ const InspectionsList: React.FC<unknown> = () => {
             pagination.direction === 1 ? SortDirectionEnum.Asc : SortDirectionEnum.Desc,
         },
         courseCode: pagination.courseCode,
-        status: pagination.status,
+        status: pagination.status === 'Alles' ? undefined : pagination.status,
         title: pagination.title,
         from: pagination.from,
         to: pagination.to,
@@ -195,102 +221,154 @@ const InspectionsList: React.FC<unknown> = () => {
           <Col>&nbsp;</Col>
         </Row>
         <div className="form-horizontal">
-          <Form
-            schema={{
-              courseCode: [pagination.courseCode, yup.string().max(10)],
-              title: [pagination.title, yup.string().max(255)],
-              status: [
-                pagination.status ? pagination.status : null,
-                yup.string().max(50).nullable(),
-              ],
-              from: [pagination.from ? new Date(pagination.from) : null, yup.date().nullable()],
-              to: [pagination.to ? new Date(pagination.to) : null, yup.date().nullable()],
-            }}
-            onSubmit={(values: any) => {
+          <form
+            onSubmit={handleSubmit((values) => {
               setStateAndQueryParam({
                 ...pagination,
                 pageNumber: 0,
                 first: 0,
                 courseCode: values.courseCode,
                 title: values.title,
-                status: values.status,
+                status: values.status === null ? undefined : (values.status as VisitatieStatusEnum),
                 from: values.from?.getTime(),
                 to: values.to?.getTime(),
               });
-            }}
+            })}
           >
-            {() => (
-              <>
-                <div className="row">
-                  <div className="col-sm-6">
-                    <FormText
-                      name={'courseCode'}
-                      label={'Cursuscode'}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName="col-sm-8"
-                    />
-                    <FormText
-                      name={'title'}
-                      label={'Titel'}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName="col-sm-8"
-                      placeholder="Zoek op deel van de titel"
-                    />
-                    <FormSelect
-                      name={'status'}
-                      label={'Status'}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName="col-sm-8"
-                      options={[
-                        { label: 'Alles', value: null },
-                        {
-                          label: VisitatieStatusEnum.Ingepland,
-                          value: VisitatieStatusEnum.Ingepland,
-                        },
-                        {
-                          label: 'Rapport wordt opgesteld',
-                          value: VisitatieStatusEnum.RapportWordtOpgesteld,
-                        },
-                        {
-                          label: VisitatieStatusEnum.Ingediend,
-                          value: VisitatieStatusEnum.Ingediend,
-                        },
-                      ]}
-                    />
+            <>
+              <div className="row">
+                <div className="col-sm-6">
+                  <div className={`form-group ${errors?.courseCode ? 'has-error' : ''}`}>
+                    <label className="control-label col-sm-4">Cursuscode</label>
+                    <div className="col-sm-8">
+                      <input
+                        className="form-control"
+                        {...register(`courseCode`)}
+                        placeholder="Zoek op cursus code"
+                      />
+
+                      {errors?.courseCode && (
+                        <span className="help-block">{errors?.courseCode.message}</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="col-sm-6">
-                    <FormCalendar
-                      name={'from'}
-                      label={'Datum inspectie van'}
-                      placeholder="Inspectie datum van"
-                      showButtonBar={true}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName="col-sm-8"
-                    />
-                    <FormCalendar
-                      name={'to'}
-                      label={'Datum inspectie tot/met'}
-                      placeholder="Inspectie datum tot/met"
-                      showButtonBar={true}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName="col-sm-8"
-                    />
+                  <div className={`form-group ${errors?.title ? 'has-error' : ''}`}>
+                    <label className="control-label col-sm-4">Titel</label>
+                    <div className="col-sm-8">
+                      <input
+                        className="form-control"
+                        {...register(`title`)}
+                        placeholder="Zoek op deel van de titel"
+                      />
+
+                      {errors?.title && <span className="help-block">{errors?.title.message}</span>}
+                    </div>
                   </div>
-                </div>
-                <div className="row">
-                  <div className="col-sm-6">
-                    <FormItem
-                      label={''}
-                      labelClassNames={'col-sm-4'}
-                      formControlClassName={'col-sm-8 col-sm-offset-4'}
-                    >
-                      <Button label={'Zoeken'} buttonType="submit" icon="fas fa-search" />
-                    </FormItem>
+                  <div className={`form-group ${errors?.status ? 'has-error' : ''}`}>
+                    <label className="control-label col-sm-4">Status</label>
+                    <div className="col-sm-8">
+                      <Controller
+                        name="status"
+                        control={control}
+                        render={({ field: { onChange, value, name } }) => (
+                          <Select
+                            options={[
+                              { label: 'Alles', value: 'Alles' },
+                              {
+                                label: VisitatieStatusEnum.Ingepland,
+                                value: VisitatieStatusEnum.Ingepland,
+                              },
+                              {
+                                label: 'Rapport wordt opgesteld',
+                                value: VisitatieStatusEnum.RapportWordtOpgesteld,
+                              },
+                              {
+                                label: VisitatieStatusEnum.Ingediend,
+                                value: VisitatieStatusEnum.Ingediend,
+                              },
+                            ]}
+                            value={value}
+                            onChange={onChange}
+                            name={name}
+                            style={{ width: '100%' }}
+                          ></Select>
+                        )}
+                      />
+
+                      {errors?.title && <span className="help-block">{errors?.title.message}</span>}
+                    </div>
                   </div>
                 </div>
-              </>
-            )}
-          </Form>
+                <div className="col-sm-6">
+                  <div className={`form-group ${errors?.from ? 'has-error' : ''}`}>
+                    <label className="control-label col-sm-6">Inspectie datum van</label>
+                    <div className="col-sm-6">
+                      <Controller
+                        name="from"
+                        control={control}
+                        render={({ field: { onChange, value, name } }) => (
+                          <Datepicker
+                            style={{ width: '100%' }}
+                            name={name}
+                            onChange={onChange}
+                            value={value === null ? undefined : (new Date(value) as Date)}
+                            showButtonBar={true}
+                            placeholder="Inspectie datum van"
+                            showIcon={true}
+                            showWeek={true}
+                            monthNavigator={true}
+                            yearRange="2007:2030"
+                          ></Datepicker>
+                        )}
+                      />
+
+                      {errors?.from && <span className="help-block">{errors?.from.message}</span>}
+                    </div>
+                  </div>
+                  <div className={`form-group ${errors?.to ? 'has-error' : ''}`}>
+                    <label className="control-label col-sm-6">Inspectie tot/met</label>
+                    <div className="col-sm-6">
+                      <Controller
+                        name="to"
+                        control={control}
+                        render={({ field: { onChange, value, name } }) => (
+                          <Datepicker
+                            style={{ width: '100%' }}
+                            name={name}
+                            onChange={onChange}
+                            value={value === null ? undefined : (value as Date)}
+                            showButtonBar={true}
+                            placeholder="Inspectie datum tot/met"
+                            showIcon={true}
+                            showWeek={true}
+                            monthNavigator={true}
+                            yearNavigator={true}
+                            yearRange="2007:2030"
+                          ></Datepicker>
+                        )}
+                      />
+
+                      {errors?.to && <span className="help-block">{errors?.to.message}</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-sm-6">
+                  <div className="form-group">
+                    <div className="col-sm-8 col-sm-offset-4">
+                      <Button
+                        label={'Zoeken'}
+                        disabled={!isValid}
+                        buttonType="submit"
+                        icon="fas fa-search"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          </form>
         </div>
 
         <DataTable
@@ -483,7 +561,7 @@ const InspectionsList: React.FC<unknown> = () => {
             body={(row: any) => row.Cursus.CursusCode}
           />
           <Column
-            field="Titel"
+            field="Cursus:Titel"
             header={'Titel'}
             sortable={true}
             body={(row: any) => row.Cursus.Titel}

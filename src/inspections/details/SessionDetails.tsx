@@ -6,7 +6,6 @@ import { Panel } from '@erkenningen/ui/layout/panel';
 import { useGetSessionQuery } from '../../generated/graphql';
 import { formatCapitalEnum, toDutchDate } from '@erkenningen/ui/utils';
 import { FormStaticItem } from '../../components/FormStaticItem';
-// import './InspectionDetails.css';
 import { Button } from '@erkenningen/ui/components/button';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { useParams } from 'react-router-dom';

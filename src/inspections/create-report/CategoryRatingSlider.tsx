@@ -11,7 +11,7 @@ const CategoryRatingSlider: React.FC<{
   const c = watch(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const);
 
   const handleRatingChange = (e: any) =>
-    setValue(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, e.target.value);
+    setValue(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, +e.target.value);
 
   return (
     <>

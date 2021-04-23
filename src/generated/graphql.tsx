@@ -1303,7 +1303,6 @@ export type Visitatie = {
   SessieID: Scalars['Int'];
   PersoonID: Scalars['Int'];
   Rapport?: Maybe<Scalars['String']>;
-  RapportTemplateJson?: Maybe<Scalars['SafeString']>;
   VragenJson?: Maybe<Scalars['SafeString']>;
   Rapportcijfer?: Maybe<Scalars['Int']>;
   Status: VisitatieStatusEnum;
@@ -1856,7 +1855,7 @@ export type GetVisitationQueryVariables = Exact<{
 }>;
 
 
-export type GetVisitationQuery = { Visitation?: Maybe<{ __typename?: 'Visitatie', VisitatieID: number, SessieID: number, DatumVisitatie?: Maybe<any>, DatumRapport?: Maybe<any>, Rapportcijfer?: Maybe<number>, Rapport?: Maybe<string>, RapportTemplateJson?: Maybe<any>, VragenJson?: Maybe<any>, Status: VisitatieStatusEnum, VolgensIntentieAanbod: boolean, PersoonID: number, Sessie?: Maybe<{ __typename?: 'Sessie', SessieType: string }>, Inspecteur?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }>, DiscussieVisitaties?: Maybe<Array<Maybe<(
+export type GetVisitationQuery = { Visitation?: Maybe<{ __typename?: 'Visitatie', VisitatieID: number, SessieID: number, DatumVisitatie?: Maybe<any>, DatumRapport?: Maybe<any>, Rapportcijfer?: Maybe<number>, Rapport?: Maybe<string>, VragenJson?: Maybe<any>, Status: VisitatieStatusEnum, VolgensIntentieAanbod: boolean, PersoonID: number, Sessie?: Maybe<{ __typename?: 'Sessie', SessieType: string }>, Inspecteur?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }>, DiscussieVisitaties?: Maybe<Array<Maybe<(
       { __typename?: 'DiscussieVisitatie' }
       & DiscussieVisitatieFieldsFragment
     )>>>, VisitatieBeoordelingCategorieen?: Maybe<Array<Maybe<(
@@ -2117,7 +2116,6 @@ export const GetVisitationDocument = gql`
     DatumRapport
     Rapportcijfer
     Rapport
-    RapportTemplateJson
     VragenJson
     Status
     VolgensIntentieAanbod

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Switch, Route, HashRouter, Redirect } from 'react-router-dom';
-// import { FormatErrorParams } from 'yup';
 import * as yup from 'yup';
 
 import { Alert } from '@erkenningen/ui/components/alert';
@@ -80,7 +79,6 @@ const App: React.FC<unknown> = () => {
             <GrowlProvider>
               <ConfirmProvider>
                 <Switch>
-                  {/* <Route path="/wijzig/:id" component={CourseEdit} /> */}
                   <Route path="/details/:visitatieId/:sessieId" component={InspectionDetails} />
                   <Route
                     path="/commentaar-geven/:visitatieId/:sessieId"
@@ -92,9 +90,7 @@ const App: React.FC<unknown> = () => {
                   />
                   <Route path="/declaratie-indienen/:visitatieId" component={CreateDeclaration} />
                   <Route path="/factuur-bekijken/:visitatieId" component={InvoiceInfo} />
-                  {/*
-                  <Route path="/nieuw" component={CourseNewSelectSpecialty} />
-                  <Route path="/gereed/:examVersionId" component={CourseReady} /> */}
+
                   <Route path="/overzicht" component={InspectionsList} />
                   <Route path="/">
                     <Redirect

@@ -51,7 +51,6 @@ query getVisitation($input: visitationInput!) {
     DatumRapport
     Rapportcijfer
     Rapport
-    RapportTemplateJson
     VragenJson
     Status
     VolgensIntentieAanbod

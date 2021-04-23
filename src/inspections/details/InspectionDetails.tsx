@@ -139,7 +139,6 @@ const InspectionDetails: React.FC<any> = (props) => {
               <EditReport
                 visitatieId={+visitatieId}
                 status={visitatie?.Status}
-                rapportTemplateJson={visitatie?.RapportTemplateJson}
                 vragenJson={visitatie?.VragenJson}
                 categories={visitatie?.VisitatieBeoordelingCategorieen}
                 isAssignedInspector={isAssignedInspector}

@@ -43,7 +43,7 @@ const CreateDeclaration: React.FC<any> = () => {
       );
   };
 
-  const schemaNormal = yup.object().shape({
+  const schema = yup.object().shape({
     NrOfKilometers: yup.number().integer().min(0, '0 of meer').max(500, 'Max 500 km.'),
     PublicTransport: yupValidateMoney('OV'),
     NrOfDayParts: yup.number().min(0, '0 of meer').max(9, 'Max 9'),
@@ -64,7 +64,7 @@ const CreateDeclaration: React.FC<any> = () => {
     handleSubmit,
     control,
     formState: { errors, isValid },
-  } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
+  } = useForm({ mode: 'onChange', resolver: yupResolver(schema), defaultValues });
 
   const { loading, data } = useGetVisitationDeclarationInfoQuery({
     fetchPolicy: 'no-cache',
