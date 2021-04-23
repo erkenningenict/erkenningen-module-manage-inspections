@@ -127,6 +127,14 @@ const CreateDeclaration: React.FC<any> = () => {
       </Panel>
     );
   }
+  const getInvoiceJsLink = (link: string | undefined, labelText: string): { __html: string } => {
+    if (!link) {
+      return { __html: '' };
+    }
+    return {
+      __html: `<a href="javascript: void(0)" class="btn btn-primary" onclick="${link};return false;">${labelText}</a>`,
+    };
+  };
 
   if (invoiceCreated) {
     return (
@@ -134,7 +142,12 @@ const CreateDeclaration: React.FC<any> = () => {
         <p>
           Factuur nummer: {invoiceCreated.createDeclarationInvoice.FactuurNummer} is aangemaakt.
         </p>
-        <a href={invoiceCreated.createDeclarationInvoice.InvoiceLink}>Bekijk factuur</a>
+        <div
+          dangerouslySetInnerHTML={getInvoiceJsLink(
+            invoiceCreated.createDeclarationInvoice.InvoiceLink,
+            'Bekijk factuur',
+          )}
+        ></div>
         <br />
         <br />
         {goBackToListView()}

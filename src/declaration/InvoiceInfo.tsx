@@ -42,11 +42,25 @@ const InvoiceInfo: React.FC = () => {
     );
   }
 
+  const getInvoiceJsLink = (link: string | undefined, labelText: string): { __html: string } => {
+    if (!link) {
+      return { __html: '' };
+    }
+    return {
+      __html: `<a href="javascript: void(0)" class="btn btn-primary" onclick="${link};return false;">${labelText}</a>`,
+    };
+  };
+
   return (
     <>
       <Panel title="Factuur van inspectie" className="form-horizontal">
         <p>Factuur nummer: {data?.VisitationDeclaration?.FactuurNummer} is aangemaakt.</p>
-        <a href={data?.VisitationDeclaration?.InvoiceLink}>Bekijk factuur</a>
+        <div
+          dangerouslySetInnerHTML={getInvoiceJsLink(
+            data?.VisitationDeclaration?.InvoiceLink,
+            'Bekijk factuur',
+          )}
+        ></div>
         <br />
         <br />
         <a
