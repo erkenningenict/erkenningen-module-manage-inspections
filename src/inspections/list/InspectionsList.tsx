@@ -151,7 +151,7 @@ const InspectionsList: React.FC<unknown> = () => {
   const defaultValues = {
     courseCode: pagination.courseCode,
     title: pagination.title,
-    status: pagination.status || null,
+    status: pagination.status || 'Alles',
     from: pagination.from ? new Date(pagination.from) : null,
     to: pagination.to ? new Date(pagination.to) : null,
   };
