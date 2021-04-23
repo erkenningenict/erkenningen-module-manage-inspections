@@ -247,6 +247,12 @@ export enum DebiteurTypeEnum {
   Exameninstelling = 'exameninstelling'
 }
 
+export type DeclarationInvoiceCreatedResult = {
+  __typename?: 'DeclarationInvoiceCreatedResult';
+  InvoiceLink: Scalars['String'];
+  FactuurNummer: Scalars['String'];
+};
+
 export type DeleteExamInput = {
   CursusID?: Maybe<Scalars['Int']>;
 };
@@ -267,7 +273,6 @@ export type DiscussieVisitatie = {
   VakgroepID?: Maybe<Scalars['Int']>;
   Commentaar?: Maybe<Scalars['String']>;
   DatumTijd?: Maybe<Scalars['Date']>;
-  DatumTijdUTC?: Maybe<Scalars['Date']>;
   IsAuteurVakgroep?: Maybe<Scalars['Boolean']>;
   IsAuteurInspecteur?: Maybe<Scalars['Boolean']>;
   Persoon?: Maybe<Persoon>;
@@ -365,6 +370,11 @@ export type GetInspectionPlanningInput = {
   isInspector: Scalars['Boolean'];
   isRector: Scalars['Boolean'];
 };
+
+export enum InkoopVerkoopEnum {
+  Inkoop = 'INKOOP',
+  Verkoop = 'VERKOOP'
+}
 
 export type InspectionPlanningData = {
   __typename?: 'InspectionPlanningData';
@@ -527,6 +537,7 @@ export type Mutation = {
   multiUpload: MultiUploadResult;
   addVisitationComment?: Maybe<DiscussieVisitatie>;
   updateVisitationReport: Visitatie;
+  createDeclarationInvoice: DeclarationInvoiceCreatedResult;
 };
 
 
@@ -652,6 +663,11 @@ export type MutationAddVisitationCommentArgs = {
 
 export type MutationUpdateVisitationReportArgs = {
   input: UpdateVisitationReportInput;
+};
+
+
+export type MutationCreateDeclarationInvoiceArgs = {
+  input: CreateDeclarationInvoiceInput;
 };
 
 export type My = {
@@ -822,6 +838,13 @@ export type PlanningData = {
   VolgensIntentieAanbod?: Maybe<Scalars['Boolean']>;
 };
 
+export enum ProductEnum {
+  D1 = 'D1',
+  D2 = 'D2',
+  D3 = 'D3',
+  D4 = 'D4'
+}
+
 export type Query = {
   __typename?: 'Query';
   searchCard?: Maybe<Certificering>;
@@ -865,6 +888,7 @@ export type Query = {
   Vakgroepen: Array<Maybe<Vakgroep>>;
   Visitations?: Maybe<VisitationInfoNodes>;
   Visitation?: Maybe<Visitatie>;
+  VisitationDeclaration?: Maybe<VisitationDeclaration>;
   /**
    * Gets a list of all available pre educations (vooropleidingen)
    * Optionally pass a array of codes (similar in vooropleiding.code) to filter the list (i.e. ["30.00", "30.01"])
@@ -1000,6 +1024,11 @@ export type QueryVisitationsArgs = {
 
 
 export type QueryVisitationArgs = {
+  input: VisitationInput;
+};
+
+
+export type QueryVisitationDeclarationArgs = {
   input: VisitationInput;
 };
 
@@ -1318,19 +1347,6 @@ export type VisitatieBeoordelingCategorie = {
   Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraag>>>;
 };
 
-export type VisitatieBeoordelingCategorieInput = {
-  VisitatieBeoordelingCategorieID: Scalars['ID'];
-  VisitatieID: Scalars['Int'];
-  CategorieTemplateID: Scalars['Int'];
-  CategorieNaam: Scalars['String'];
-  Weging: Scalars['Float'];
-  TotaalPunten?: Maybe<Scalars['Float']>;
-  Cijfer?: Maybe<Scalars['Float']>;
-  Versie: Scalars['String'];
-  VanafDatum: Scalars['Date'];
-  Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraagInput>>>;
-};
-
 export type VisitatieBeoordelingCategorieVraag = {
   __typename?: 'VisitatieBeoordelingCategorieVraag';
   VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
@@ -1350,25 +1366,21 @@ export type VisitatieBeoordelingCategorieVraag = {
   GewijzigdDoor?: Maybe<Scalars['String']>;
 };
 
-export type VisitatieBeoordelingCategorieVraagInput = {
-  VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
-  VisitatieBeoordelingCategorieID: Scalars['ID'];
-  CategorieTemplateID: Scalars['Int'];
-  VraagTemplateID: Scalars['Int'];
-  Naam: Scalars['String'];
-  Weging: Scalars['Float'];
-  TotaalPunten?: Maybe<Scalars['Float']>;
-  Cijfer?: Maybe<Scalars['Float']>;
-  Toelichting?: Maybe<Scalars['String']>;
-  Versie: Scalars['String'];
-  VanafDatum: Scalars['Date'];
-};
-
 export enum VisitatieStatusEnum {
   Ingepland = 'Ingepland',
   RapportWordtOpgesteld = 'RapportWordtOpgesteld',
   Ingediend = 'Ingediend'
 }
+
+export type VisitationDeclaration = {
+  __typename?: 'VisitationDeclaration';
+  Visitatie?: Maybe<Visitatie>;
+  TariffDayPart: Scalars['Float'];
+  TariffKm: Scalars['Float'];
+  HasInvoice: Scalars['Boolean'];
+  InvoiceLink?: Maybe<Scalars['String']>;
+  FactuurNummer?: Maybe<Scalars['String']>;
+};
 
 export type VisitationInfoNodes = {
   __typename?: 'VisitationInfoNodes';
@@ -1449,6 +1461,15 @@ export type ContactgegevensInput = {
   Email?: Maybe<Scalars['SafeString']>;
   Telefoon?: Maybe<Scalars['SafeString']>;
   Website?: Maybe<Scalars['SafeString']>;
+};
+
+export type CreateDeclarationInvoiceInput = {
+  VisitatieID: Scalars['Int'];
+  NrOfKilometers?: Maybe<Scalars['Int']>;
+  NrOfDayParts?: Maybe<Scalars['Int']>;
+  PublicTransport?: Maybe<Scalars['Float']>;
+  Other?: Maybe<Scalars['Float']>;
+  OtherDescription?: Maybe<Scalars['SafeString']>;
 };
 
 export type CreateLicenseInput = {
@@ -1771,6 +1792,33 @@ export type UpdateVisitationReportInput = {
   Status: VisitatieStatusEnum;
 };
 
+export type VisitatieBeoordelingCategorieInput = {
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  VisitatieID: Scalars['Int'];
+  CategorieTemplateID: Scalars['Int'];
+  CategorieNaam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+  Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraagInput>>>;
+};
+
+export type VisitatieBeoordelingCategorieVraagInput = {
+  VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  CategorieTemplateID: Scalars['Int'];
+  VraagTemplateID: Scalars['Int'];
+  Naam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Toelichting?: Maybe<Scalars['String']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+};
+
 export type VisitationInput = {
   visitatieId: Scalars['Int'];
 };
@@ -1823,7 +1871,14 @@ export type VisitatieBeoordelingCategorieFieldsFragment = { __typename?: 'Visita
 
 export type VisitatieBeoorderlingCategorieVraagFieldsFragment = { __typename?: 'VisitatieBeoordelingCategorieVraag', VisitatieBeoordelingCategorieVraagID: string, VisitatieBeoordelingCategorieID: string, CategorieTemplateID: number, VraagTemplateID: number, Naam: string, Weging: number, TotaalPunten?: Maybe<number>, Cijfer?: Maybe<number>, Toelichting?: Maybe<string>, Versie: string, VanafDatum: any };
 
-export type DiscussieVisitatieFieldsFragment = { __typename?: 'DiscussieVisitatie', DiscussieVisitatieID: number, PersoonID?: Maybe<number>, Commentaar?: Maybe<string>, DatumTijdUTC?: Maybe<any>, IsAuteurVakgroep?: Maybe<boolean>, IsAuteurInspecteur?: Maybe<boolean>, Persoon?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }> };
+export type DiscussieVisitatieFieldsFragment = { __typename?: 'DiscussieVisitatie', DiscussieVisitatieID: number, PersoonID?: Maybe<number>, Commentaar?: Maybe<string>, DatumTijd?: Maybe<any>, IsAuteurVakgroep?: Maybe<boolean>, IsAuteurInspecteur?: Maybe<boolean>, Persoon?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }> };
+
+export type GetVisitationDeclarationInfoQueryVariables = Exact<{
+  input: VisitationInput;
+}>;
+
+
+export type GetVisitationDeclarationInfoQuery = { VisitationDeclaration?: Maybe<{ __typename?: 'VisitationDeclaration', TariffDayPart: number, TariffKm: number, HasInvoice: boolean, InvoiceLink?: Maybe<string>, FactuurNummer?: Maybe<string>, Visitatie?: Maybe<{ __typename?: 'Visitatie', VisitatieID: number, DatumVisitatie?: Maybe<any>, Sessie?: Maybe<{ __typename?: 'Sessie', Lokatie?: Maybe<{ __typename?: 'Lokatie', Contactgegevens: { __typename?: 'Contactgegevens', Woonplaats: string } }> }>, Cursus?: Maybe<{ __typename?: 'Cursus', Vak: { __typename?: 'Vak', Vakgroep?: Maybe<{ __typename?: 'Vakgroep', Naam: string }>, ExamenInstelling?: Maybe<{ __typename?: 'ExamenInstelling', Naam: string }> } }> }> }> };
 
 export type GetSessionQueryVariables = Exact<{
   sessieId: Scalars['Int'];
@@ -1842,7 +1897,7 @@ export type AddVisitationCommentMutationVariables = Exact<{
 }>;
 
 
-export type AddVisitationCommentMutation = { addVisitationComment?: Maybe<{ __typename?: 'DiscussieVisitatie', DiscussieVisitatieID: number, VisitatieID: number, PersoonID?: Maybe<number>, DatumTijdUTC?: Maybe<any>, IsAuteurVakgroep?: Maybe<boolean>, IsAuteurInspecteur?: Maybe<boolean>, Persoon?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }> }> };
+export type AddVisitationCommentMutation = { addVisitationComment?: Maybe<{ __typename?: 'DiscussieVisitatie', DiscussieVisitatieID: number, VisitatieID: number, PersoonID?: Maybe<number>, DatumTijd?: Maybe<any>, IsAuteurVakgroep?: Maybe<boolean>, IsAuteurInspecteur?: Maybe<boolean>, Persoon?: Maybe<{ __typename?: 'Persoon', SortableFullName?: Maybe<string> }> }> };
 
 export type UpdateVisitationReportMutationVariables = Exact<{
   input: UpdateVisitationReportInput;
@@ -1853,6 +1908,13 @@ export type UpdateVisitationReportMutation = { updateVisitationReport: { __typen
       { __typename?: 'VisitatieBeoordelingCategorie' }
       & VisitatieBeoordelingCategorieFieldsFragment
     )>>> } };
+
+export type CreateDeclarationInvoiceMutationVariables = Exact<{
+  input: CreateDeclarationInvoiceInput;
+}>;
+
+
+export type CreateDeclarationInvoiceMutation = { createDeclarationInvoice: { __typename?: 'DeclarationInvoiceCreatedResult', FactuurNummer: string, InvoiceLink: string } };
 
 export const VisitatieBeoorderlingCategorieVraagFieldsFragmentDoc = gql`
     fragment VisitatieBeoorderlingCategorieVraagFields on VisitatieBeoordelingCategorieVraag {
@@ -1890,7 +1952,7 @@ export const DiscussieVisitatieFieldsFragmentDoc = gql`
   DiscussieVisitatieID
   PersoonID
   Commentaar
-  DatumTijdUTC
+  DatumTijd
   IsAuteurVakgroep
   IsAuteurInspecteur
   Persoon {
@@ -2101,6 +2163,66 @@ export function useGetVisitationLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetVisitationQueryHookResult = ReturnType<typeof useGetVisitationQuery>;
 export type GetVisitationLazyQueryHookResult = ReturnType<typeof useGetVisitationLazyQuery>;
 export type GetVisitationQueryResult = Apollo.QueryResult<GetVisitationQuery, GetVisitationQueryVariables>;
+export const GetVisitationDeclarationInfoDocument = gql`
+    query getVisitationDeclarationInfo($input: visitationInput!) {
+  VisitationDeclaration(input: $input) {
+    Visitatie {
+      VisitatieID
+      Sessie {
+        Lokatie {
+          Contactgegevens {
+            Woonplaats
+          }
+        }
+      }
+      Cursus {
+        Vak {
+          Vakgroep {
+            Naam
+          }
+          ExamenInstelling {
+            Naam
+          }
+        }
+      }
+      DatumVisitatie
+    }
+    TariffDayPart
+    TariffKm
+    HasInvoice
+    InvoiceLink
+    FactuurNummer
+  }
+}
+    `;
+
+/**
+ * __useGetVisitationDeclarationInfoQuery__
+ *
+ * To run a query within a React component, call `useGetVisitationDeclarationInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVisitationDeclarationInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVisitationDeclarationInfoQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetVisitationDeclarationInfoQuery(baseOptions: Apollo.QueryHookOptions<GetVisitationDeclarationInfoQuery, GetVisitationDeclarationInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetVisitationDeclarationInfoQuery, GetVisitationDeclarationInfoQueryVariables>(GetVisitationDeclarationInfoDocument, options);
+      }
+export function useGetVisitationDeclarationInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetVisitationDeclarationInfoQuery, GetVisitationDeclarationInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetVisitationDeclarationInfoQuery, GetVisitationDeclarationInfoQueryVariables>(GetVisitationDeclarationInfoDocument, options);
+        }
+export type GetVisitationDeclarationInfoQueryHookResult = ReturnType<typeof useGetVisitationDeclarationInfoQuery>;
+export type GetVisitationDeclarationInfoLazyQueryHookResult = ReturnType<typeof useGetVisitationDeclarationInfoLazyQuery>;
+export type GetVisitationDeclarationInfoQueryResult = Apollo.QueryResult<GetVisitationDeclarationInfoQuery, GetVisitationDeclarationInfoQueryVariables>;
 export const GetSessionDocument = gql`
     query getSession($sessieId: Int!) {
   Sessie(sessieId: $sessieId) {
@@ -2142,7 +2264,7 @@ export const AddVisitationCommentDocument = gql`
     DiscussieVisitatieID
     VisitatieID
     PersoonID
-    DatumTijdUTC
+    DatumTijd
     IsAuteurVakgroep
     IsAuteurInspecteur
     Persoon {
@@ -2219,3 +2341,37 @@ export function useUpdateVisitationReportMutation(baseOptions?: Apollo.MutationH
 export type UpdateVisitationReportMutationHookResult = ReturnType<typeof useUpdateVisitationReportMutation>;
 export type UpdateVisitationReportMutationResult = Apollo.MutationResult<UpdateVisitationReportMutation>;
 export type UpdateVisitationReportMutationOptions = Apollo.BaseMutationOptions<UpdateVisitationReportMutation, UpdateVisitationReportMutationVariables>;
+export const CreateDeclarationInvoiceDocument = gql`
+    mutation createDeclarationInvoice($input: createDeclarationInvoiceInput!) {
+  createDeclarationInvoice(input: $input) {
+    FactuurNummer
+    InvoiceLink
+  }
+}
+    `;
+export type CreateDeclarationInvoiceMutationFn = Apollo.MutationFunction<CreateDeclarationInvoiceMutation, CreateDeclarationInvoiceMutationVariables>;
+
+/**
+ * __useCreateDeclarationInvoiceMutation__
+ *
+ * To run a mutation, you first call `useCreateDeclarationInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDeclarationInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDeclarationInvoiceMutation, { data, loading, error }] = useCreateDeclarationInvoiceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDeclarationInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateDeclarationInvoiceMutation, CreateDeclarationInvoiceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDeclarationInvoiceMutation, CreateDeclarationInvoiceMutationVariables>(CreateDeclarationInvoiceDocument, options);
+      }
+export type CreateDeclarationInvoiceMutationHookResult = ReturnType<typeof useCreateDeclarationInvoiceMutation>;
+export type CreateDeclarationInvoiceMutationResult = Apollo.MutationResult<CreateDeclarationInvoiceMutation>;
+export type CreateDeclarationInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateDeclarationInvoiceMutation, CreateDeclarationInvoiceMutationVariables>;

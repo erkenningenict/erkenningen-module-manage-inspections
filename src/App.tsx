@@ -13,6 +13,8 @@ import { ConfirmProvider } from '@erkenningen/ui/components/confirm';
 import { UserContext, useAuth, Roles, hasOneOfRoles } from './shared/Auth';
 import InspectionsList from 'inspections/list/InspectionsList';
 import InspectionDetails from './inspections/details/InspectionDetails';
+import CreateDeclaration from './declaration/CreateDeclaration';
+import InvoiceInfo from './declaration/InvoiceInfo';
 
 // @TODO Move to lib?
 yup.setLocale({
@@ -88,6 +90,8 @@ const App: React.FC<unknown> = () => {
                     path="/rapport-maken/:visitatieId/:sessieId"
                     component={InspectionDetails}
                   />
+                  <Route path="/declaratie-indienen/:visitatieId" component={CreateDeclaration} />
+                  <Route path="/factuur-bekijken/:visitatieId" component={InvoiceInfo} />
                   {/*
                   <Route path="/nieuw" component={CourseNewSelectSpecialty} />
                   <Route path="/gereed/:examVersionId" component={CourseReady} /> */}

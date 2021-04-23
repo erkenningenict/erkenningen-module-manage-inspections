@@ -47,7 +47,25 @@ const ParseReportText: React.FC<{ report: string | undefined }> = ({ report }) =
             .replace(
               'Aanvullende opmerkingen: ',
               '<div class="question">Aanvullende opmerkingen: </div>',
-            ) || '',
+            )
+            // Digital specialties
+            .replace(
+              'Administratieve intake: ',
+              '<div class="question">Administratieve intake: </div>',
+            )
+            .replace(
+              'Inrichting persoonsverificatie: ',
+              '<div class="question">Inrichting persoonsverificatie: </div>',
+            )
+            .replace(
+              'Afhandeling forum bijdrage: ',
+              '<div class="question">Afhandeling forum bijdrage: </div>',
+            )
+            .replace(
+              'Verwerking voltooide deelnemers: ',
+              '<div class="question">Verwerking voltooide deelnemers: </div>',
+            )
+            .replace('Opmerkingen: ', '<div class="question">Opmerkingen: </div>') || '',
       }}
     ></div>
   );

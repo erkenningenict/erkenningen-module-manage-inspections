@@ -25,6 +25,8 @@ import Form from 'components/Form';
 import { FormCalendar, FormItem, FormSelect, FormText } from '@erkenningen/ui/components/form';
 import { isAfter } from 'date-fns';
 import { nrOfMonthsAfterWhichCommentsAreNotAllowed } from '../../utils/time';
+import { Row } from '@erkenningen/ui/layout/row';
+import { Col } from '@erkenningen/ui/layout/col';
 
 type IPagination = {
   pageNumber: number;
@@ -188,7 +190,10 @@ const InspectionsList: React.FC<unknown> = () => {
 
   return (
     <div>
-      <Panel title="Inspecties">
+      <Panel title="Inspecties" doNotIncludeBody={true}>
+        <Row>
+          <Col>&nbsp;</Col>
+        </Row>
         <div className="form-horizontal">
           <Form
             schema={{
@@ -322,24 +327,17 @@ const InspectionsList: React.FC<unknown> = () => {
           <Column
             bodyClassName={styles.center}
             body={(row: Visitatie) => (
-              <>
-              {row.VisitatieID}
+              <div style={{ display: 'flex' }}>
                 <Button
                   label={''}
                   icon="fas fa-info"
                   onClick={() => history.push(`/details/${row.VisitatieID}/${row.SessieID}`)}
-                  style={{ fontSize: '1rem' }}
+                  style={{ fontSize: '1.5rem' }}
                   tooltip="Bekijk details van deze inspectie"
                   type={'info'}
                   title={`${row.VisitatieID}`}
                 />
-              </>
-            )}
-          />
-          <Column
-            bodyClassName={styles.center}
-            body={(row: Visitatie) => (
-              <>
+
                 {row.DatumRapport &&
                   isAfter(
                     add(new Date(row.DatumRapport), {
@@ -351,32 +349,54 @@ const InspectionsList: React.FC<unknown> = () => {
                       label={''}
                       icon="fas fa-comment"
                       onClick={() =>
-                        history.push(`/commentaar-geven/${row.VisitatieID}/${row.SessieID}`)
+                        history.push(
+                          `/commentaar-geven/${row.VisitatieID}/${row.SessieID}#discussie`,
+                        )
                       }
                       tooltip="Commentaar geven"
-                      style={{ fontSize: '1rem' }}
+                      style={{ fontSize: '1.5rem' }}
                     />
                   )}
-              </>
-            )}
-          />
-          <Column
-            bodyClassName={styles.center}
-            body={(row: Visitatie) => (
-              <>
+
                 {(row.Status === VisitatieStatusEnum.Ingepland ||
-                  row.Status === VisitatieStatusEnum.RapportWordtOpgesteld) && (
-                  <Button
-                    label={''}
-                    icon="fas fa-file-alt"
-                    onClick={() =>
-                      history.push(`/rapport-maken/${row.VisitatieID}/${row.SessieID}`)
-                    }
-                    tooltip="Rapport maken of wijzigen"
-                    style={{ fontSize: '1rem' }}
-                  />
-                )}
-              </>
+                  row.Status === VisitatieStatusEnum.RapportWordtOpgesteld) &&
+                  !row.IsDeclarationPossible &&
+                  !row.IsDeclarationSubmitted && (
+                    <Button
+                      label={''}
+                      icon="fas fa-file-alt"
+                      onClick={() =>
+                        history.push(`/rapport-maken/${row.VisitatieID}/${row.SessieID}`)
+                      }
+                      tooltip="Rapport maken of wijzigen"
+                      style={{ fontSize: '1.5rem' }}
+                    />
+                  )}
+                {row.Status === VisitatieStatusEnum.Ingediend &&
+                  row.IsDeclarationPossible &&
+                  !row.IsDeclarationSubmitted && (
+                    <Button
+                      label={''}
+                      icon="fas fa-receipt"
+                      onClick={() => history.push(`/declaratie-indienen/${row.VisitatieID}`)}
+                      tooltip="Declaratie indienen"
+                      type="secondary"
+                      style={{ fontSize: '1.5rem' }}
+                    />
+                  )}
+                {row.Status === VisitatieStatusEnum.Ingediend &&
+                  !row.IsDeclarationPossible &&
+                  row.IsDeclarationSubmitted && (
+                    <Button
+                      label={''}
+                      icon="fas fa-file-invoice"
+                      onClick={() => history.push(`/factuur-bekijken/${row.VisitatieID}`)}
+                      type="info"
+                      tooltip="Factuur beschikbaar"
+                      style={{ fontSize: '1.5rem' }}
+                    />
+                  )}
+              </div>
             )}
           />
           <Column
@@ -406,49 +426,53 @@ const InspectionsList: React.FC<unknown> = () => {
             header={'Cijfer'}
             sortable={true}
             sortField={'Rapportcijfer'}
-            body={(row: any) => (
-              <>
-                <div className={styles.reportNumberColumn}>
-                  <div style={{ width: '20px' }} className={styles.reportNumber}>
-                    {row.Rapportcijfer ? row.Rapportcijfer : ''}
-                  </div>
-                  <div className={styles.icon}>
-                    {row.Rapportcijfer < 5 && row.Status === 'Ingediend' && (
-                      <>
-                        <Tooltip target=".negative" position={'top'} />
-                        <i
-                          className="fas fa-times-circle negative"
-                          style={{ color: 'red' }}
-                          data-pr-tooltip="Negatief"
-                        ></i>
-                      </>
-                    )}
-                    {row.Rapportcijfer > 5 && row.Status === 'Ingediend' && (
-                      <>
-                        <Tooltip target=".positive" position={'top'} />
-                        <i
-                          className="fas fa-check-circle positive"
-                          style={{ color: 'green' }}
-                          data-pr-tooltip="Positief"
-                        ></i>
-                      </>
-                    )}
-                  </div>
-                  <div style={{ width: '20px' }}>
-                    {row.VolgensIntentieAanbod === false && (
-                      <>
-                        <Tooltip target=".notToIntention" position={'top'} />
-                        <i
-                          className="fas fa-exclamation-circle notToIntention"
-                          style={{ color: 'yellow', background: '#333', borderRadius: '8px' }}
-                          data-pr-tooltip="Niet volgens de intentie van het aanbod"
-                        ></i>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+            body={(row: Visitatie) => {
+              return (
+                row.Status === VisitatieStatusEnum.Ingediend && (
+                  <>
+                    <div className={styles.reportNumberColumn}>
+                      <div style={{ width: '20px' }} className={styles.reportNumber}>
+                        {row.Rapportcijfer ? row.Rapportcijfer : ''}
+                      </div>
+                      <div className={styles.icon}>
+                        {row.Rapportcijfer && row?.Rapportcijfer < 5 && row.Status === 'Ingediend' && (
+                          <>
+                            <Tooltip target=".negative" position={'top'} />
+                            <i
+                              className="fas fa-times-circle negative"
+                              style={{ color: 'red' }}
+                              data-pr-tooltip="Negatief"
+                            ></i>
+                          </>
+                        )}
+                        {row.Rapportcijfer && row?.Rapportcijfer > 5 && row.Status === 'Ingediend' && (
+                          <>
+                            <Tooltip target=".positive" position={'top'} />
+                            <i
+                              className="fas fa-check-circle positive"
+                              style={{ color: 'green' }}
+                              data-pr-tooltip="Positief"
+                            ></i>
+                          </>
+                        )}
+                      </div>
+                      <div style={{ width: '20px' }}>
+                        {row.VolgensIntentieAanbod === false && (
+                          <>
+                            <Tooltip target=".notToIntention" position={'top'} />
+                            <i
+                              className="fas fa-exclamation-circle notToIntention"
+                              style={{ color: 'yellow', background: '#333', borderRadius: '8px' }}
+                              data-pr-tooltip="Niet volgens de intentie van het aanbod"
+                            ></i>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )
+              );
+            }}
             style={{ minWidth: '58px' }}
           />
           <Column

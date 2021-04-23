@@ -109,13 +109,45 @@ fragment DiscussieVisitatieFields on DiscussieVisitatie {
   DiscussieVisitatieID
   PersoonID
   Commentaar
-  DatumTijdUTC
+  DatumTijd
   IsAuteurVakgroep
   IsAuteurInspecteur
   Persoon {
     SortableFullName
   }
 }
+
+query getVisitationDeclarationInfo($input: visitationInput!) {
+  VisitationDeclaration(input: $input) {
+    Visitatie {
+      VisitatieID
+      Sessie {
+        Lokatie {
+          Contactgegevens {
+            Woonplaats
+          }
+        }
+      }
+      Cursus {
+        Vak {
+          Vakgroep {
+            Naam
+          }
+          ExamenInstelling {
+            Naam
+          }
+        }
+      }
+      DatumVisitatie
+    }
+    TariffDayPart
+    TariffKm
+    HasInvoice
+    InvoiceLink
+    FactuurNummer
+  }
+}
+
 
 query getSession($sessieId: Int!) {
   Sessie(sessieId: $sessieId) {
@@ -173,7 +205,7 @@ mutation addVisitationComment($input: addVisitationCommentInput!) {
     DiscussieVisitatieID
     VisitatieID
     PersoonID
-    DatumTijdUTC
+    DatumTijd
     IsAuteurVakgroep
     IsAuteurInspecteur
     Persoon {
@@ -194,5 +226,12 @@ mutation updateVisitationReport($input: updateVisitationReportInput!) {
     VisitatieBeoordelingCategorieen {
       ...VisitatieBeoordelingCategorieFields
     }
+  }
+}
+
+mutation createDeclarationInvoice($input: createDeclarationInvoiceInput!) {
+  createDeclarationInvoice(input: $input) {
+    FactuurNummer
+    InvoiceLink
   }
 }

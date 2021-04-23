@@ -21,14 +21,15 @@ import EditReport from '../create-report/EditReport';
 import { hasRole, Roles, useAuth } from '../../shared/Auth';
 import ParseReportText from './ParseReportText';
 
-const InspectionDetails: React.FC<unknown> = () => {
+const InspectionDetails: React.FC<any> = (props) => {
   const { showGrowl } = useGrowlContext();
   const auth = useAuth();
   const history = useHistory<any>();
   const isCreateReportRoute = useRouteMatch('/rapport-maken/:visitatieId/:sessieId');
 
-  const { visitatieId: visitatieId, sessieId: sessieId } = useParams<any>();
-  console.log('#DH# params', visitatieId, sessieId);
+  const { visitatieId: visitatieId } = useParams<{
+    visitatieId: string;
+  }>();
 
   const { loading: inspectionLoading, data: inspection } = useGetVisitationQuery({
     // fetchPolicy: 'cache-and-network',
@@ -52,8 +53,7 @@ const InspectionDetails: React.FC<unknown> = () => {
   }
 
   const visitatie = inspection?.Visitation;
-  console.log('#DH# Vistatie', inspection?.Visitation?.PersoonID);
-  console.log('#DH# My?', auth.my?.Persoon?.PersoonID);
+
   const isAssignedInspector = auth.my?.Persoon?.PersoonID === visitatie?.PersoonID;
   const hasData = visitatie?.VisitatieBeoordelingCategorieen?.length !== 0;
   const isRector = hasRole(Roles.Rector, auth?.my?.Roles);
@@ -97,15 +97,8 @@ const InspectionDetails: React.FC<unknown> = () => {
                 {toDutchDate(visitatie?.DatumVisitatie)}
               </FormStaticItem>
               {visitatie?.Status !== VisitatieStatusEnum.Ingediend && (
-                <div>
+                <div className="panel-body">
                   <Alert type="info">Er is nog geen (definitief) rapport gemaakt.</Alert>
-                  {/* {auth.my?.Persoon?.PersoonID === visitatie?.PersoonID && (
-                    <Button
-                      buttonType="button"
-                      label="Rapport maken"
-                      onClick={() => console.log('#DH# ')}
-                    ></Button>
-                  )} */}
                 </div>
               )}
               {visitatie?.Status === VisitatieStatusEnum.Ingediend && (
@@ -151,6 +144,7 @@ const InspectionDetails: React.FC<unknown> = () => {
                 categories={visitatie?.VisitatieBeoordelingCategorieen}
                 isAssignedInspector={isAssignedInspector}
                 isRector={isRector}
+                sessieType={visitatie?.Sessie?.SessieType}
               ></EditReport>
             </Col>
           </Row>
@@ -159,6 +153,7 @@ const InspectionDetails: React.FC<unknown> = () => {
           <Col>
             {visitatie && (
               <DiscussionDetails
+                {...props}
                 discussions={visitatie?.DiscussieVisitaties}
                 visitatieId={visitatie?.VisitatieID}
                 alloNewDiscussion={

@@ -4,7 +4,7 @@ import { Col } from '@erkenningen/ui/layout/col';
 import { Panel } from '@erkenningen/ui/layout/panel';
 import { Row } from '@erkenningen/ui/layout/row';
 import { toDutchDate } from '@erkenningen/ui/utils';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DiscussieVisitatieFieldsFragment,
   GetVisitationDocument,
@@ -17,13 +17,27 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { useForm } from 'react-hook-form';
 import TextareaAutosize from 'react-autosize-textarea';
+import { RouteComponentProps } from 'react-router-dom';
 
-const DiscussionDetails: React.FC<{
+interface PropTypes extends RouteComponentProps {
   discussions?: DiscussieVisitatieFieldsFragment[];
   alloNewDiscussion: boolean;
   visitatieId: number;
-}> = (props) => {
+}
+
+const DiscussionDetails: React.FC<PropTypes> = (props) => {
   const { showGrowl } = useGrowlContext();
+
+  useEffect(() => {
+    const hash = props.history.location.hash;
+    if (hash && document.getElementById(hash.substr(1))) {
+      // Check if there is a hash and if an element with that id exists
+      setTimeout(() => {
+        document?.getElementById(hash.substr(1))?.scrollIntoView({ behavior: 'smooth' });
+      }, 250);
+    }
+  }, [props.history.location.hash]);
+
   const schema = yup.object().shape({
     comment: yup.string().max(1000).required(),
   });
@@ -86,7 +100,8 @@ const DiscussionDetails: React.FC<{
         variables: { input: { visitatieId: props.visitatieId } },
         data: {
           Visitation: {
-            ...(newVisitationData.DiscussieVisitaties?.concat(discussieVisitatie) as any),
+            ...newVisitationData,
+            DiscussieVisitaties: newVisitationData?.DiscussieVisitaties?.concat(discussieVisitatie),
             __typename: 'Visitatie',
           },
         },
@@ -96,7 +111,14 @@ const DiscussionDetails: React.FC<{
 
   return (
     <div id="discussie">
-      <Panel title="Discussie rond de inspectie" doNotIncludeBody={true}>
+      <Panel
+        title={`Discussie rond de inspectie${
+          discussions?.length && discussions.length > 0
+            ? ` (aantal regels: ${discussions?.length})`
+            : ''
+        }`}
+        doNotIncludeBody={true}
+      >
         {props.alloNewDiscussion && (
           <form className="form form-horizontal" onSubmit={handleSubmit(onSubmit)}>
             <div
@@ -142,18 +164,17 @@ const DiscussionDetails: React.FC<{
             />
           )}
 
+          <div id="discussies"></div>
           {discussions
             ?.slice()
-            ?.sort((a, b) => (a.DatumTijdUTC < b.DatumTijdUTC ? desc : -1 * desc))
+            ?.sort((a, b) => (a.DatumTijd < b.DatumTijd ? desc : -1 * desc))
             ?.map((d: DiscussieVisitatieFieldsFragment, index: number) => (
               <Row
-                key={d.DatumTijdUTC}
+                key={d.DatumTijd}
                 className={`row discussionRow ${index % 2 === 1 ? 'even' : 'odd'}`}
               >
                 <Col size="col-sm-3">
-                  <div className="dateTime">
-                    {toDutchDate(d.DatumTijdUTC, { includeTime: true })}
-                  </div>
+                  <div className="dateTime">{toDutchDate(d.DatumTijd, { includeTime: true })}</div>
                   <div>{d?.Persoon?.SortableFullName}</div>
                   <div className="source">
                     {d?.IsAuteurInspecteur ? 'Inspecteur' : 'Kennisaanbieder'}

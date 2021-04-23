@@ -13,6 +13,9 @@ import './index.scss';
 
 const cache = new InMemoryCache({
   typePolicies: {
+    // Visitatie: {
+    //   keyFields: ['VisitatieID'],
+    // },
     DiscussieVisitatie: {
       keyFields: ['DiscussieVisitatieID'],
     },

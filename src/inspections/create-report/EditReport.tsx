@@ -19,7 +19,10 @@ import { getRatingsTemplate } from '../../utils/ratings-template';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextQuestions from './TextQuestions';
-import { getTextQuestionTemplate } from '../../utils/questions-template';
+import {
+  getTextQuestionForDigitalSpecialtyTemplate,
+  getTextQuestionTemplate,
+} from '../../utils/questions-template';
 import { IQuestionType } from '../../types/text-questions';
 import RatingCategories from './RatingCategories';
 import ReportTotal from './ReportTotal';
@@ -42,19 +45,27 @@ const EditReport: React.FC<{
   categories?: VisitatieBeoordelingCategorieFieldsFragment[];
   isRector: boolean;
   isAssignedInspector: boolean;
+  sessieType?: string;
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
 
   let meta: IMeta = { version: 'Onbekend' };
   let ratingsTemplate: VisitatieBeoordelingCategorieInput[] = [];
   let textQuestions: IQuestionType[] = [];
-  console.log('#DH# t tem ', props.vragenJson);
+
   if (
     props.vragenJson === undefined ||
     props.vragenJson === null ||
     props.categories?.length === 0
   ) {
-    textQuestions = getTextQuestionTemplate();
+    switch (props.sessieType) {
+      case 'DigitaalAanbodInspectie':
+        textQuestions = getTextQuestionForDigitalSpecialtyTemplate();
+        break;
+      default:
+        textQuestions = getTextQuestionTemplate();
+    }
+
     meta = { version: '1.0' };
   } else {
     const jsonTemplate = JSON.parse(props.vragenJson);
@@ -71,8 +82,6 @@ const EditReport: React.FC<{
   } else {
     ratingsTemplate = props.categories || getRatingsTemplate(props.visitatieId);
   }
-
-  console.log('#DH# cats', props.categories);
 
   const [
     updateVisitationReport,
@@ -94,7 +103,6 @@ const EditReport: React.FC<{
       });
     },
     update(cache, result) {
-      console.log('#DH# update', result);
       const updateVisitationReport = result?.data?.updateVisitationReport;
       if (!updateVisitationReport) {
         return;
@@ -134,7 +142,6 @@ const EditReport: React.FC<{
     yupRatingsRemark: yup.string().max(500),
   };
 
-  // console.log('#DH# scheme', textQuestionsValidationScheme);
   const schemaNormal = yup.object().shape({
     textQuestions: yup.array().of(
       yup.object().shape({
@@ -153,14 +160,12 @@ const EditReport: React.FC<{
     ),
   });
 
-  // console.log('#DH# schema', schemaNormal);
   const numberRatings: VisitatieBeoordelingCategorieInput[] = [...ratingsTemplate];
 
   const defaultValues = {
     textQuestions: textQuestions,
     ratings: numberRatings,
   };
-  // console.log('#DH# defaultValues', defaultValues);
 
   const {
     register,
@@ -169,7 +174,7 @@ const EditReport: React.FC<{
     getValues,
     setValue,
     watch,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
 
   const { fields: ratingFields } = useFieldArray({
@@ -187,14 +192,12 @@ const EditReport: React.FC<{
   };
 
   const update = async (values: any, close = false) => {
-    console.log('#DH# SAVEDDDDDD', values);
     const report = convertTextQuestionsToReport(values.textQuestions);
 
     const scorings = getScores(values.ratings);
     const ratings = values.ratings.map((c: VisitatieBeoordelingCategorieFieldsFragment) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...cat } = c;
-      console.log('#DH# cat', cat);
       const catWithoutTypeName =
         cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -203,7 +206,6 @@ const EditReport: React.FC<{
         }) || undefined;
       return { ...cat, ...{ Vragen: catWithoutTypeName } };
     });
-    console.log('#DH# ratings', ratings);
     await updateVisitationReport({
       variables: {
         input: {
@@ -220,7 +222,6 @@ const EditReport: React.FC<{
     });
   };
 
-  // console.log('#DH# defaultValues', defaultValues);
   const isReadOnly =
     props.status === VisitatieStatusEnum.Ingediend ||
     (!props.isRector && !props.isAssignedInspector);
@@ -262,7 +263,7 @@ const EditReport: React.FC<{
               <div className="form-group">
                 <div className="col-sm-8 col-sm-offset-4">
                   <Button
-                    disabled={!isValid}
+                    disabled={!isValid && isDirty}
                     label={'Rapport opslaan'}
                     buttonType="submit"
                     icon="pi pi-check"
