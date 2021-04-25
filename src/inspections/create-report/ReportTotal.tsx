@@ -13,7 +13,9 @@ const ReportTotal: React.FC<{ numberRatings: VisitatieBeoordelingCategorieInput[
       <div className="form-group">
         <label className="control-label col-sm-4">Rapportcijfer</label>
         <div className="col-sm-8 form-control-static">
-          <strong>{scorings?.RapportCijfer}</strong>
+          <strong>
+            {scorings?.RapportCijfer} (obv van {scorings?.TotaalPunten || 0} van 100 punten)
+          </strong>
         </div>
       </div>
       <div className="form-group">
@@ -28,7 +30,7 @@ const ReportTotal: React.FC<{ numberRatings: VisitatieBeoordelingCategorieInput[
                 style={{ color: 'yellow', background: '#333', borderRadius: '8px' }}
                 data-pr-tooltip="Niet volgens de intentie van het aanbod"
               ></i>{' '}
-              <strong>Afwijkend van aanbod</strong>
+              <strong>Afwijkend van aanbod (minder dan 28 punten)</strong>
             </>
           )}
         </div>

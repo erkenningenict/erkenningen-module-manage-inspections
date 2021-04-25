@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Panel } from '@erkenningen/ui/layout/panel';
 import {
   GetVisitationDocument,
@@ -47,6 +47,7 @@ const EditReport: React.FC<{
   sessieType?: string;
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
+  const [required, setRequired] = useState<boolean>(false);
 
   let meta: IMeta = { version: 'Onbekend' };
   let ratingsTemplate: VisitatieBeoordelingCategorieInput[] = [];
@@ -132,11 +133,17 @@ const EditReport: React.FC<{
 
   const yupTypes: any = {
     yupTextQuestion: yup.string().max(500),
+    yupTextQuestionRequired: yup.string().max(500).required(),
     yupRating: yup
       .number()
       .integer('Alleen gehele getallen tussen 0 en 10')
       .min(0, 'Cijfer tussen 0 en 10')
-      .max(10, 'Cijfer tussen 0 en 10')
+      .max(10, 'Cijfer tussen 0 en 10'),
+    yupRatingRequired: yup
+      .number()
+      .integer('Alleen gehele getallen tussen 1 en 10')
+      .min(1, 'Cijfer tussen 1 en 10')
+      .max(10, 'Cijfer tussen 1 en 10')
       .required(),
     yupRatingsRemark: yup.string().max(500),
   };
@@ -144,14 +151,14 @@ const EditReport: React.FC<{
   const schemaNormal = yup.object().shape({
     textQuestions: yup.array().of(
       yup.object().shape({
-        answer: yupTypes['yupTextQuestion'],
+        answer: required ? yupTypes['yupTextQuestionRequired'] : yupTypes['yupTextQuestion'],
       }),
     ),
     ratings: yup.array().of(
       yup.object().shape({
         Vragen: yup.array().of(
           yup.object().shape({
-            Cijfer: yupTypes['yupRating'],
+            Cijfer: required ? yupTypes['yupRatingRequired'] : yupTypes['yupRating'],
             Toelichting: yupTypes['yupRatingsRemark'],
           }),
         ),
@@ -173,6 +180,7 @@ const EditReport: React.FC<{
     getValues,
     setValue,
     watch,
+    trigger,
     formState: { errors, isValid, isDirty },
   } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
 
@@ -182,11 +190,19 @@ const EditReport: React.FC<{
   });
   const ratings = useWatch({ control, name: `ratings` });
 
-  const submitAndClose = () => {
-    update(getValues(), true);
+  const submitAndClose = async () => {
+    setTimeout(async () => {
+      setRequired(true);
+      const invalidFields = await trigger();
+      if (invalidFields) {
+        update(getValues(), true);
+      }
+    }, 1);
   };
 
   const onSubmit = async (values: any) => {
+    setRequired(false);
+    trigger();
     update(values);
   };
 
@@ -253,7 +269,7 @@ const EditReport: React.FC<{
               <h4>Cijfers</h4>
             </div>
             <RatingCategories
-              {...{ control, register, watch, defaultValues, getValues, setValue, errors }}
+              {...{ control, register, watch, defaultValues, getValues, setValue, errors, trigger }}
               fields={ratingFields}
               isReadOnly={isReadOnly}
             ></RatingCategories>

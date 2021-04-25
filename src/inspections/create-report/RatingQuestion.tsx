@@ -5,6 +5,7 @@ import { IQuestionType } from '../../types/text-questions';
 import TextareaAutosize from 'react-autosize-textarea';
 import RatingTotal from './RatingTotal';
 import CategoryRatingSlider from './CategoryRatingSlider';
+import { Tooltip } from 'primereact/tooltip';
 
 const RatingQuestion: React.FC<{
   register: UseFormRegister<{
@@ -18,7 +19,18 @@ const RatingQuestion: React.FC<{
   errors: any;
   watch: any;
   isReadOnly: boolean;
-}> = ({ register, control, nestIndex, getValues, setValue, watch, errors, isReadOnly }) => {
+  trigger: any;
+}> = ({
+  register,
+  control,
+  nestIndex,
+  getValues,
+  setValue,
+  watch,
+  errors,
+  isReadOnly,
+  trigger,
+}) => {
   const { fields: questions } = useFieldArray({
     name: `ratings.${nestIndex}.Vragen` as 'ratings.0.Vragen',
     control,
@@ -40,15 +52,38 @@ const RatingQuestion: React.FC<{
           ratingError = true;
         }
 
+        let questionRelevantForAfwijkendVanAanbod = false;
+        switch ((field as any).Naam) {
+          case 'Doelstelling behaald':
+          case 'Voorgenomen inhoud behandeld, event. incl thuisopdracht':
+          case 'Werkwijze als gepland toegepast':
+            questionRelevantForAfwijkendVanAanbod = true;
+            break;
+        }
+
         return (
           <div
             key={field.VisitatieBeoordelingCategorieVraagID}
             className={`form-group ${ratingError ? 'has-error' : ''}`}
           >
-            <label className={`control-label col-sm-4 `}>{(field as any).Naam}</label>
+            <label className={`control-label col-sm-4 `}>
+              {(field as any).Naam}{' '}
+              {questionRelevantForAfwijkendVanAanbod ? (
+                <>
+                  <Tooltip target=".notToIntention" position={'top'} />
+                  <i
+                    className="fas fa-exclamation-circle notToIntention"
+                    style={{ color: 'yellow', background: '#333', borderRadius: '8px' }}
+                    data-pr-tooltip="Cijfer telt mee voor berekening, afwijkend van aanbod (< 28 punten)."
+                  ></i>
+                </>
+              ) : (
+                ''
+              )}
+            </label>
             <div className="col-sm-3" key={field.VisitatieBeoordelingCategorieVraagID}>
               <CategoryRatingSlider
-                {...{ register, control, watch, getValues, nestIndex, index, setValue }}
+                {...{ register, control, watch, getValues, nestIndex, index, setValue, trigger }}
                 isReadOnly={isReadOnly}
               ></CategoryRatingSlider>
               <input

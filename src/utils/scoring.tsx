@@ -3,6 +3,7 @@ import { VisitatieBeoordelingCategorieInput } from '../generated/graphql';
 export type IGetScoreReturnValues = {
   RapportCijfer: number;
   VolgensIntentieAanbod: boolean;
+  TotaalPunten: number;
 };
 
 export function getScores(
@@ -51,6 +52,7 @@ export function getScores(
     return {
       RapportCijfer: 0,
       VolgensIntentieAanbod: false,
+      TotaalPunten: 0,
     };
   }
 
@@ -58,30 +60,35 @@ export function getScores(
     return {
       RapportCijfer: 2,
       VolgensIntentieAanbod: volgensIntentieAanbod,
+      TotaalPunten: ratingsTotal,
     };
   }
   if (ratingsTotal < 50) {
     return {
       RapportCijfer: 4,
       VolgensIntentieAanbod: volgensIntentieAanbod,
+      TotaalPunten: ratingsTotal,
     };
   }
   if (ratingsTotal < 70) {
     return {
       RapportCijfer: 6,
       VolgensIntentieAanbod: volgensIntentieAanbod,
+      TotaalPunten: ratingsTotal,
     };
   }
   if (ratingsTotal < 90) {
     return {
       RapportCijfer: 8,
       VolgensIntentieAanbod: volgensIntentieAanbod,
+      TotaalPunten: ratingsTotal,
     };
   }
   if (ratingsTotal <= 100) {
     return {
       RapportCijfer: 10,
       VolgensIntentieAanbod: volgensIntentieAanbod,
+      TotaalPunten: ratingsTotal,
     };
   }
 

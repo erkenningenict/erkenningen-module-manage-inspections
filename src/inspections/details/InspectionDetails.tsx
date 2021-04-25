@@ -5,7 +5,7 @@ import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 
 import { useGetVisitationQuery, VisitatieStatusEnum } from '../../generated/graphql';
-import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Row } from '@erkenningen/ui/layout/row';
 import { Col } from '@erkenningen/ui/layout/col';
 import { toDutchDate, formatCapitalEnum } from '@erkenningen/ui/utils';
@@ -25,7 +25,6 @@ const InspectionDetails: React.FC<any> = (props) => {
   const { showGrowl } = useGrowlContext();
   const auth = useAuth();
   const history = useHistory<any>();
-  const isCreateReportRoute = useRouteMatch('/rapport-maken/:visitatieId/:sessieId');
 
   const { visitatieId: visitatieId } = useParams<{
     visitatieId: string;
@@ -129,9 +128,7 @@ const InspectionDetails: React.FC<any> = (props) => {
               )}
             </Panel>
           </Col>
-          <Col size="col-md-6">
-            {visitatie && <SessionDetails showAll={isCreateReportRoute === null}></SessionDetails>}
-          </Col>
+          <Col size="col-md-6">{visitatie && <SessionDetails></SessionDetails>}</Col>
         </Row>
         {!(visitatie?.Status === VisitatieStatusEnum.Ingediend && !hasData) && (
           <Row>

@@ -11,12 +11,10 @@ import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { useParams } from 'react-router-dom';
 import './SessionDetails.scss';
 
-const SessionDetails: React.FC<{
-  showAll: boolean;
-}> = (props) => {
+const SessionDetails: React.FC = () => {
   const { showGrowl } = useGrowlContext();
   const { sessieId } = useParams<any>();
-  const [showAll, setShowAll] = useState<boolean>(props.showAll);
+  const [showAll, setShowAll] = useState<boolean>(false);
 
   const { loading: sessionLoading, data: session } = useGetSessionQuery({
     fetchPolicy: 'network-only',

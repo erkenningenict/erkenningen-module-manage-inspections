@@ -44,8 +44,9 @@ const RatingCategories: React.FC<{
     'id'
   >[];
   watch: any;
+  trigger: any;
   isReadOnly: boolean;
-}> = ({ register, control, watch, getValues, setValue, errors, isReadOnly }) => {
+}> = ({ register, control, watch, getValues, setValue, errors, isReadOnly, trigger }) => {
   const { fields } = useFieldArray<{ ratings: VisitatieBeoordelingCategorieInput[] }>({
     control,
     name: 'ratings' as `ratings`,
@@ -86,7 +87,7 @@ const RatingCategories: React.FC<{
                 <div className="form-control-static text-right">
                   <span className="visible-xs-inline">Totaal: </span>
                   <CategoryRatingTotal
-                    {...{ index, getValues, watch, setValue, control }}
+                    {...{ index, getValues, watch, setValue, control, trigger }}
                     // weging={field.Weging}
                   ></CategoryRatingTotal>
                   <input
@@ -122,7 +123,7 @@ const RatingCategories: React.FC<{
             key={field.id}
             nestIndex={index}
             isReadOnly={isReadOnly}
-            {...{ control, register, watch, getValues, setValue, errors }}
+            {...{ control, register, watch, getValues, setValue, errors, trigger }}
           ></RatingQuestion>
         </div>
       ))}
