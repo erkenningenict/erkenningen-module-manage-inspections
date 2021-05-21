@@ -30,7 +30,8 @@ const RatingTotal: React.FC<{
     setValue(`ratings.${nestIndex}.Cijfer` as const, categoryRating || 0);
   }, [c, nestIndex, index]);
 
-  return <span>{total}</span>;
+  // return <span>{total}</span>;
+  return null;
 };
 
 export default RatingTotal;

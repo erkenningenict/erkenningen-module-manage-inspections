@@ -81,11 +81,7 @@ const RatingQuestion: React.FC<{
                 ''
               )}
             </label>
-            <div className="col-sm-3" key={field.VisitatieBeoordelingCategorieVraagID}>
-              <CategoryRatingSlider
-                {...{ register, control, watch, getValues, nestIndex, index, setValue, trigger }}
-                isReadOnly={isReadOnly}
-              ></CategoryRatingSlider>
+            <div className="col-sm-1" key={field.VisitatieBeoordelingCategorieVraagID}>
               <input
                 key={field.VisitatieBeoordelingCategorieVraagID}
                 type="number"
@@ -93,7 +89,7 @@ const RatingQuestion: React.FC<{
                 {...register(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, {
                   valueAsNumber: true,
                 })}
-                style={{ position: 'relative', zIndex: 0 }}
+                defaultValue={watch(`ratings.${nestIndex}.Vragen.${index}.Cijfer`)}
                 min={0}
                 max={10}
                 readOnly={isReadOnly}
@@ -104,7 +100,15 @@ const RatingQuestion: React.FC<{
                 </span>
               )}
             </div>
-            <div className="col-sm-1">
+
+            <div className="col-sm-2">
+              <div className="visible-xs-block" style={{ height: '15px' }}></div>
+              <CategoryRatingSlider
+                {...{ register, control, watch, getValues, nestIndex, index, setValue, trigger }}
+                isReadOnly={isReadOnly}
+              ></CategoryRatingSlider>
+            </div>
+            {/* <div className="col-sm-1">
               <div className="form-control-static text-right">
                 <span className="visible-xs-inline">Weging: </span>
                 {(field as any).Weging}
@@ -112,12 +116,14 @@ const RatingQuestion: React.FC<{
             </div>
             <div className="col-sm-1 form-control-static text-right">
               <span className="visible-xs-inline">Totaal: </span>
-              <RatingTotal
-                {...{ nestIndex, index, getValues, watch, setValue, control }}
-                weging={parseInt((field as any).Weging, 10)}
-              ></RatingTotal>
-            </div>
-            <div className="col-sm-3">
+            </div> */}
+
+            <RatingTotal
+              {...{ nestIndex, index, getValues, watch, setValue, control }}
+              weging={parseInt((field as any).Weging, 10)}
+            ></RatingTotal>
+            <div className="col-sm-5">
+              <div className="visible-xs-block" style={{ height: '15px' }}></div>
               <TextareaAutosize
                 className="form-control"
                 key={(field as any).id}

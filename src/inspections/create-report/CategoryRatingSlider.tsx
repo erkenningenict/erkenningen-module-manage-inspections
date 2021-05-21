@@ -20,13 +20,8 @@ const CategoryRatingSlider: React.FC<{
     <>
       <input
         type="range"
-        className="slider"
-        style={{
-          position: 'absolute',
-          zIndex: 1,
-          left: '45px',
-          width: 'calc(100% - 88px)',
-        }}
+        className="form-control slider"
+        style={{ background: '#d3ebea', height: '36px' }}
         value={c}
         onChange={handleRatingChange}
         disabled={isReadOnly}
