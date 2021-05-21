@@ -81,11 +81,15 @@ const RatingQuestion: React.FC<{
                 ''
               )}
             </label>
-            <div className="col-sm-1" key={field.VisitatieBeoordelingCategorieVraagID}>
+            <div
+              className="col-sm-1 no-padding-right-sm"
+              key={field.VisitatieBeoordelingCategorieVraagID}
+            >
               <input
                 key={field.VisitatieBeoordelingCategorieVraagID}
                 type="number"
                 className="form-control"
+                style={{ padding: '6px 2px 6px 12px' }}
                 {...register(`ratings.${nestIndex}.Vragen.${index}.Cijfer` as const, {
                   valueAsNumber: true,
                 })}
