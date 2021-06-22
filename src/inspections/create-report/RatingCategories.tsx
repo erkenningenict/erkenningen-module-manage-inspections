@@ -53,12 +53,39 @@ const RatingCategories: React.FC<{
   });
   return (
     <>
+      <div className="form-group hidden-xs">
+        <label className="control-label col-sm-4"></label>
+        <div className="col-sm-1 form-control-static text-bold">Cijfer</div>
+        <div className="col-sm-2 form-control-static text-bold">Cijfer (schuifregelaar)</div>
+
+        {/* <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
+              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div> */}
+        <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
+      </div>
       {fields?.map((field, index) => (
-        <div key={field.id}>
-          <div className="sticky" style={{ backgroundColor: '#eee', marginBottom: 0 }}>
+        <div
+          key={field.id}
+          style={{
+            backgroundColor: index / 1 !== 1 ? '#eee' : 'transparent',
+            paddingBottom: '15px',
+            paddingTop: '15px',
+          }}
+        >
+          <div
+            className="sticky"
+            style={{
+              backgroundColor: index / 1 !== 1 ? '#eee' : '#fff',
+              // paddingBottom: '15px',
+              // paddingTop: '15px',
+            }}
+            // style={{ backgroundColor: index / 1 === 1 ? '#eee' : 'transparent', marginBottom: 0 }}
+          >
             <div className={`form-group`}>
-              <label className="control-label col-sm-4 textRight" style={{ fontSize: '110%' }}>
-                {field.CategorieNaam}
+              <label
+                className="control-label col-sm-4 textRight"
+                style={{ fontSize: '110%', textTransform: 'uppercase' }}
+              >
+                {(field as any).CategorieNaam}
               </label>
               <div className="col-sm-3">
                 <div className="form-control-static">
@@ -106,20 +133,6 @@ const RatingCategories: React.FC<{
                   />
                 </div>
               </div>
-            </div>
-            <div
-              className="form-group hidden-xs"
-              style={{
-                backgroundColor: '#eee',
-              }}
-            >
-              <label className="control-label col-sm-4"></label>
-              <div className="col-sm-1 form-control-static text-bold">Cijfer</div>
-              <div className="col-sm-2 form-control-static text-bold">Cijfer (schuifregelaar)</div>
-
-              {/* <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div> */}
-              <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
             </div>
           </div>
 
