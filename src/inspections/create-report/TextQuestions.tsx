@@ -34,18 +34,25 @@ const TextQuestions: React.FC<{
         >
           <label className="control-label col-sm-4">{(field as any).question}</label>
           <div className="col-sm-8">
-            <input
-              {...register(`textQuestions.${index}.question` as `textQuestions.0.question`)}
-              className="hidden"
-            />
-            <TextareaAutosize
-              className="form-control"
-              readOnly={isReadOnly}
-              placeholder={`${(field as any).question}`}
-              {...register(`textQuestions.${index}.answer` as `textQuestions.0.answer`)}
-            />
-            {errors?.textQuestions && errors?.textQuestions[index]?.answer && (
-              <span className="help-block">{errors?.textQuestions[index]?.answer?.message}</span>
+            {isReadOnly && <div className="form-control-static">{(field as any).answer}</div>}
+            {!isReadOnly && (
+              <>
+                <input
+                  {...register(`textQuestions.${index}.question` as `textQuestions.0.question`)}
+                  className="hidden"
+                />
+                <TextareaAutosize
+                  className="form-control"
+                  readOnly={isReadOnly}
+                  placeholder={`${(field as any).question}`}
+                  {...register(`textQuestions.${index}.answer` as `textQuestions.0.answer`)}
+                />
+                {errors?.textQuestions && errors?.textQuestions[index]?.answer && (
+                  <span className="help-block">
+                    {errors?.textQuestions[index]?.answer?.message}
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>

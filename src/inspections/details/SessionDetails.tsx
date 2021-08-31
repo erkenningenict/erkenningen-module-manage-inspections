@@ -66,7 +66,7 @@ const SessionDetails: React.FC = () => {
             minute: '2-digit',
           })}
         </FormStaticItem>
-        <FormStaticItem label="Aanbod/bijeenkomst">
+        <FormStaticItem label="Aanbod / bijeenkomst">
           {session?.Sessie?.Cursus?.VakID} {session?.Sessie?.Cursus?.CursusID}
         </FormStaticItem>
         <FormStaticItem label="Titel">{session?.Sessie?.Cursus?.Titel}</FormStaticItem>

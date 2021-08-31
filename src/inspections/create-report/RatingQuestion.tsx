@@ -112,15 +112,6 @@ const RatingQuestion: React.FC<{
                 isReadOnly={isReadOnly}
               ></CategoryRatingSlider>
             </div>
-            {/* <div className="col-sm-1">
-              <div className="form-control-static text-right">
-                <span className="visible-xs-inline">Weging: </span>
-                {(field as any).Weging}
-              </div>
-            </div>
-            <div className="col-sm-1 form-control-static text-right">
-              <span className="visible-xs-inline">Totaal: </span>
-            </div> */}
 
             <RatingTotal
               {...{ nestIndex, index, getValues, watch, setValue, control }}
@@ -128,20 +119,26 @@ const RatingQuestion: React.FC<{
             ></RatingTotal>
             <div className="col-sm-5">
               <div className="visible-xs-block" style={{ height: '15px' }}></div>
-              <TextareaAutosize
-                className="form-control"
-                key={(field as any).id}
-                readOnly={isReadOnly}
-                {...register(`ratings.${nestIndex}.Vragen.${index}.Toelichting` as const)}
-                placeholder={`Toelichting ${(field as any).Naam.toLowerCase()}`}
-              ></TextareaAutosize>
-              {errors &&
-                errors?.ratings &&
-                errors?.ratings[nestIndex] &&
-                errors?.ratings[nestIndex]?.Vragen &&
-                errors?.ratings[nestIndex]?.Vragen[index] &&
-                errors?.ratings[nestIndex]?.Vragen[index]?.Toelichting?.message}
-
+              {isReadOnly && (
+                <div className="form-control-static">{(field as any).Toelichting}</div>
+              )}
+              {!isReadOnly && (
+                <>
+                  <TextareaAutosize
+                    className="form-control"
+                    key={(field as any).id}
+                    readOnly={isReadOnly}
+                    {...register(`ratings.${nestIndex}.Vragen.${index}.Toelichting` as const)}
+                    placeholder={`Toelichting ${(field as any).Naam.toLowerCase()}`}
+                  ></TextareaAutosize>
+                  {errors &&
+                    errors?.ratings &&
+                    errors?.ratings[nestIndex] &&
+                    errors?.ratings[nestIndex]?.Vragen &&
+                    errors?.ratings[nestIndex]?.Vragen[index] &&
+                    errors?.ratings[nestIndex]?.Vragen[index]?.Toelichting?.message}
+                </>
+              )}
               <input
                 {...register(
                   `ratings.${nestIndex}.Vragen.${index}.VisitatieBeoordelingCategorieVraagID` as const,
