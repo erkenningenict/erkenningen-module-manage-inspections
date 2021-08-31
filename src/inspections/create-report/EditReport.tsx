@@ -132,8 +132,8 @@ const EditReport: React.FC<{
   });
 
   const yupTypes: any = {
-    yupTextQuestion: yup.string().max(500),
-    yupTextQuestionRequired: yup.string().max(500).required(),
+    yupTextQuestion: yup.string().max(2000),
+    yupTextQuestionRequired: yup.string().max(2000).required(),
     yupRating: yup
       .number()
       .integer('Alleen gehele getallen tussen 0 en 10')
@@ -145,7 +145,7 @@ const EditReport: React.FC<{
       .min(1, 'Cijfer tussen 1 en 10')
       .max(10, 'Cijfer tussen 1 en 10')
       .required(),
-    yupRatingsRemark: yup.string().max(500),
+    yupRatingsRemark: yup.string().max(2000),
   };
 
   const schemaNormal = yup.object().shape({
