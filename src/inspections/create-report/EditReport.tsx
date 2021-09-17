@@ -185,7 +185,7 @@ const EditReport: React.FC<{
   } = useForm({ mode: 'onChange', resolver: yupResolver(schemaNormal), defaultValues });
 
   const { fields: ratingFields } = useFieldArray({
-    name: 'ratings' as `ratings`,
+    name: 'ratings',
     control,
   });
   const ratings = useWatch({ control, name: `ratings` });

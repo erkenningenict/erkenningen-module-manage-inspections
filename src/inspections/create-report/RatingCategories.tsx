@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   UseFormRegister,
-  DeepMap,
-  FieldError,
   FieldArrayWithId,
   useFieldArray,
   UseFormGetValues,
@@ -11,7 +9,6 @@ import {
 import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
 import { IQuestionType } from '../../types/text-questions';
 import CategoryRating from './CategoryRating';
-// import CategoryRatingTotal from './CategoryRatingTotal';
 import RatingQuestion from './RatingQuestion';
 
 const RatingCategories: React.FC<{
@@ -19,13 +16,7 @@ const RatingCategories: React.FC<{
     textQuestions: IQuestionType[];
     ratings: VisitatieBeoordelingCategorieInput[];
   }>;
-  errors: DeepMap<
-    {
-      textQuestions: IQuestionType[];
-      ratings: VisitatieBeoordelingCategorieInput[];
-    },
-    FieldError
-  >;
+  errors: any;
   setValue: UseFormSetValue<{
     textQuestions: IQuestionType[];
     ratings: VisitatieBeoordelingCategorieInput[];
@@ -58,8 +49,6 @@ const RatingCategories: React.FC<{
         <div className="col-sm-1 form-control-static text-bold">Cijfer</div>
         <div className="col-sm-2 form-control-static text-bold">Cijfer (schuifregelaar)</div>
 
-        {/* <div className="col-sm-1 form-control-static text-bold textRight">Weging</div>
-              <div className="col-sm-1 form-control-static text-bold textRight">Totaal</div> */}
         <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
       </div>
       {fields?.map((field, index) => (
@@ -75,10 +64,7 @@ const RatingCategories: React.FC<{
             className="sticky"
             style={{
               backgroundColor: index / 1 !== 1 ? '#eee' : '#fff',
-              // paddingBottom: '15px',
-              // paddingTop: '15px',
             }}
-            // style={{ backgroundColor: index / 1 === 1 ? '#eee' : 'transparent', marginBottom: 0 }}
           >
             <div className={`form-group`}>
               <label
@@ -95,18 +81,8 @@ const RatingCategories: React.FC<{
                   (categorie totaal cijfer)
                 </div>
               </div>
-              {/* <div className="col-sm-1">
-                <div className="form-control-static text-right">
-                  <span className="visible-xs-inline">Weging: </span>
-                  {field.Weging}
-                </div>
-              </div> */}
               <div className="col-sm-1 hidden-xs">
                 <div className="form-control-static text-right">
-                  {/* <CategoryRatingTotal
-                    {...{ index, getValues, watch, setValue, control, trigger }}
-                     weging={field.Weging}
-                  ></CategoryRatingTotal> */}
                   <input
                     {...register(`ratings.${index}.VisitatieBeoordelingCategorieID` as const)}
                     className="hidden"

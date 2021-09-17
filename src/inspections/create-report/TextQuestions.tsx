@@ -1,6 +1,6 @@
 import React from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
-import { UseFormRegister, DeepMap, FieldError, useFieldArray } from 'react-hook-form';
+import { UseFormRegister, useFieldArray, Control } from 'react-hook-form';
 import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
 import { IQuestionType } from '../../types/text-questions';
 
@@ -9,14 +9,11 @@ const TextQuestions: React.FC<{
     textQuestions: IQuestionType[];
     ratings: VisitatieBeoordelingCategorieInput[];
   }>;
-  errors: DeepMap<
-    {
-      textQuestions: IQuestionType[];
-      ratings: VisitatieBeoordelingCategorieInput[];
-    },
-    FieldError
-  >;
-  control: any;
+  errors: any;
+  control: Control<{
+    textQuestions: IQuestionType[];
+    ratings: VisitatieBeoordelingCategorieInput[];
+  }>;
   isReadOnly: boolean;
 }> = ({ register, errors, control, isReadOnly }) => {
   const { fields } = useFieldArray({
