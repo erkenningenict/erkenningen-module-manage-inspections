@@ -9,6 +9,7 @@ import {
 import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
 import { IQuestionType } from '../../types/text-questions';
 import CategoryRating from './CategoryRating';
+import CategoryRatingTotal from './CategoryRatingTotal';
 import RatingQuestion from './RatingQuestion';
 
 const RatingCategories: React.FC<{
@@ -48,6 +49,7 @@ const RatingCategories: React.FC<{
         <label className="control-label col-sm-4"></label>
         <div className="col-sm-1 form-control-static text-bold">Cijfer</div>
         <div className="col-sm-2 form-control-static text-bold">Cijfer (schuifregelaar)</div>
+        <div className="col-sm-1 form-control-static text-bold">Weging / Punten</div>
 
         <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
       </div>
@@ -78,10 +80,15 @@ const RatingCategories: React.FC<{
                   <strong>
                     <CategoryRating {...{ index, control }}></CategoryRating>
                   </strong>{' '}
-                  (categorie totaal cijfer)
+                  (categorie cijfer)
+                  <span className="hidden-sm hidden-md hidden-lg">
+                    {' '}
+                    weging: {(field as any).Weging} / punten:{' '}
+                    <CategoryRatingTotal {...{ index, control }}></CategoryRatingTotal>
+                  </span>
                 </div>
               </div>
-              <div className="col-sm-1 hidden-xs">
+              <div className="col-xs-1 hidden-xs hidden-sm hidden-md hidden-lg">
                 <div className="form-control-static text-right">
                   <input
                     {...register(`ratings.${index}.VisitatieBeoordelingCategorieID` as const)}
@@ -107,6 +114,12 @@ const RatingCategories: React.FC<{
                     {...register(`ratings.${index}.CategorieTemplateID` as const)}
                     className="hidden"
                   />
+                </div>
+              </div>
+              <div className="col-xs-1 hidden-xs">
+                <div className="form-control-static">
+                  {(field as any).Weging} /{' '}
+                  <CategoryRatingTotal {...{ index, control }}></CategoryRatingTotal>
                 </div>
               </div>
             </div>

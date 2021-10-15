@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
-import { useDeepCompareEffect } from 'use-deep-compare';
+import React from 'react';
 import { VisitatieBeoordelingCategorieInput } from '../../generated/graphql';
-import { getScores, IGetScoreReturnValues } from '../../utils/scoring';
+import { getScores } from '../../utils/scoring';
 
 const ReportTotal: React.FC<{ numberRatings: VisitatieBeoordelingCategorieInput[] }> = (props) => {
-  const [scorings, setScorings] = useState<IGetScoreReturnValues | undefined>(undefined);
-  useDeepCompareEffect(() => {
-    setScorings(getScores(props.numberRatings));
-  }, [props.numberRatings]);
+  const scorings = getScores(props.numberRatings);
   return (
     <>
       <div className="form-group">
