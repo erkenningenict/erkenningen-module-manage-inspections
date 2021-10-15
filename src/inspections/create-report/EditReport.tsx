@@ -26,6 +26,7 @@ import {
 import { IQuestionType } from '../../types/text-questions';
 import RatingCategories from './RatingCategories';
 import ReportTotal from './ReportTotal';
+import { useHistory } from 'react-router-dom';
 
 export type ITextQuestionTemplate = {
   question: string;
@@ -47,6 +48,7 @@ const EditReport: React.FC<{
   sessieType?: string;
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
+  const history = useHistory();
   const [required, setRequired] = useState<boolean>(false);
 
   let meta: IMeta = { version: 'Onbekend' };
@@ -221,20 +223,36 @@ const EditReport: React.FC<{
         }) || undefined;
       return { ...cat, ...{ Vragen: catWithoutTypeName } };
     });
-    await updateVisitationReport({
-      variables: {
-        input: {
-          VisitatieID: props.visitatieId,
-          Status: close ? VisitatieStatusEnum.Ingediend : VisitatieStatusEnum.RapportWordtOpgesteld,
-          VragenJson: JSON.stringify({ meta: meta, questions: values.textQuestions }),
-          Rapport: report,
-          Rapportcijfer: scorings?.RapportCijfer || 0,
-          VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
-          DatumRapport: close ? new Date() : null,
-          ratings: ratings,
+    try {
+      await updateVisitationReport({
+        variables: {
+          input: {
+            VisitatieID: props.visitatieId,
+            Status: close
+              ? VisitatieStatusEnum.Ingediend
+              : VisitatieStatusEnum.RapportWordtOpgesteld,
+            VragenJson: JSON.stringify({ meta: meta, questions: values.textQuestions }),
+            Rapport: report,
+            Rapportcijfer: scorings?.RapportCijfer || 0,
+            VolgensIntentieAanbod: scorings?.VolgensIntentieAanbod || false,
+            DatumRapport: close ? new Date() : null,
+            ratings: ratings,
+          },
         },
-      },
-    });
+      });
+
+      if (close) {
+        // show declaration
+        history.push(`/declaratie-indienen/${props.visitatieId}`);
+      }
+    } catch (err) {
+      console.error('Er is een fout opgetreden', err);
+      showGrowl({
+        severity: 'error',
+        summary: 'Rapport niet bijgewerkt',
+        detail: 'Fout bij opslaan rapport',
+      });
+    }
   };
 
   const isReadOnly =

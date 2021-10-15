@@ -26,7 +26,7 @@ const CreateDeclaration: React.FC<any> = () => {
 
   const goBackToListView = () => (
     <a
-      onClick={history.goBack}
+      onClick={() => history.push('/')}
       style={{ cursor: 'pointer', marginBottom: '15px', display: 'block' }}
     >
       Terug naar overzicht
@@ -77,7 +77,7 @@ const CreateDeclaration: React.FC<any> = () => {
           sticky: true,
           detail: 'Inspectie is niet aan u toegewezen en daarom mag u geen declaratie aanmaken',
         });
-        history.goBack();
+        history.push('/');
         return;
       }
       showGrowl({
