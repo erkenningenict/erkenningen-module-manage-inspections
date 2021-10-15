@@ -119,6 +119,7 @@ const EditReport: React.FC<{
       if (!currentVisitationData) {
         return;
       }
+
       cache.writeQuery<GetVisitationQuery>({
         query: GetVisitationDocument,
         variables: { input: { visitatieId: props.visitatieId } },
@@ -219,6 +220,7 @@ const EditReport: React.FC<{
         cat?.Vragen?.map((q: VisitatieBeoorderlingCategorieVraagFieldsFragment) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { __typename, ...question } = q;
+          question.VisitatieBeoordelingCategorieID = c.VisitatieBeoordelingCategorieID;
           return question;
         }) || undefined;
       return { ...cat, ...{ Vragen: catWithoutTypeName } };
