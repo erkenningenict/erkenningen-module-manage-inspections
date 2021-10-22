@@ -49,7 +49,7 @@ const RatingCategories: React.FC<{
         <label className="control-label col-sm-4"></label>
         <div className="col-sm-1 form-control-static text-bold">Cijfer</div>
         <div className="col-sm-2 form-control-static text-bold">Cijfer (schuifregelaar)</div>
-        <div className="col-sm-1 form-control-static text-bold">Weging / Punten</div>
+        <div className="col-sm-1 form-control-static text-bold">Weging | Punten</div>
 
         <div className="col-sm-2 form-control-static text-bold">Toelichting</div>
       </div>
@@ -75,7 +75,7 @@ const RatingCategories: React.FC<{
               >
                 {(field as any).CategorieNaam}
               </label>
-              <div className="col-sm-3">
+              <div className="col-sm-3" style={{ paddingRight: '5px' }}>
                 <div className="form-control-static">
                   <strong>
                     <CategoryRating {...{ index, control }}></CategoryRating>
@@ -83,7 +83,7 @@ const RatingCategories: React.FC<{
                   (categorie cijfer)
                   <span className="hidden-sm hidden-md hidden-lg">
                     {' '}
-                    weging: {(field as any).Weging} / punten:{' '}
+                    weging: {(field as any).Weging} | punten:{' '}
                     <CategoryRatingTotal {...{ index, control }}></CategoryRatingTotal>
                   </span>
                 </div>
@@ -116,10 +116,12 @@ const RatingCategories: React.FC<{
                   />
                 </div>
               </div>
-              <div className="col-xs-1 hidden-xs">
+              <div className="col-xs-1 hidden-xs" style={{ paddingRight: '5px' }}>
                 <div className="form-control-static">
-                  {(field as any).Weging} /{' '}
-                  <CategoryRatingTotal {...{ index, control }}></CategoryRatingTotal>
+                  {(field as any).Weging} |{' '}
+                  <strong>
+                    <CategoryRatingTotal {...{ index, control }}></CategoryRatingTotal>
+                  </strong>
                 </div>
               </div>
             </div>

@@ -113,19 +113,26 @@ const RatingQuestion: React.FC<{
               ></CategoryRatingSlider>
             </div>
 
-            <div className="col-sm-1 hidden-xs">
-              {(field as any).Weging} /{' '}
-              <RatingTotal
-                {...{ nestIndex, index, getValues, watch, setValue, control }}
-                weging={parseInt((field as any).Weging, 10)}
-              ></RatingTotal>
+            <div className="col-sm-1 hidden-xs form-control-static" style={{ paddingRight: '5px' }}>
+              {(field as any).Weging} |{' '}
+              <strong>
+                <RatingTotal
+                  {...{ nestIndex, index, getValues, watch, setValue, control }}
+                  weging={parseInt((field as any).Weging, 10)}
+                ></RatingTotal>
+              </strong>
             </div>
-            <div className="col-sm-1 hidden-sm hidden-md hidden-lg">
+            <div
+              className="col-sm-1 hidden-sm hidden-md hidden-lg form-control-static"
+              style={{ paddingRight: '5px' }}
+            >
               Weging: {(field as any).Weging} / punten:{' '}
-              <RatingTotal
-                {...{ nestIndex, index, getValues, watch, setValue, control }}
-                weging={parseInt((field as any).Weging, 10)}
-              ></RatingTotal>
+              <strong>
+                <RatingTotal
+                  {...{ nestIndex, index, getValues, watch, setValue, control }}
+                  weging={parseInt((field as any).Weging, 10)}
+                ></RatingTotal>
+              </strong>
             </div>
             <div className="col-sm-4">
               <div className="visible-xs-block" style={{ height: '15px' }}></div>
