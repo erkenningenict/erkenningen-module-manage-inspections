@@ -32,7 +32,7 @@ export type AangemeldeCursusDeelname = {
   Eindtijd: Scalars['String'];
   Prijs: Scalars['Float'];
   Locatie: Scalars['String'];
-  Status: Scalars['String'];
+  Status: CursusDeelnameStatusEnum;
   IsDigitaalAanbod: Scalars['Boolean'];
 };
 
@@ -41,13 +41,20 @@ export type Beoordeling = {
   BeoordelingID: Scalars['Int'];
   VakID: Scalars['Int'];
   PersoonID?: Maybe<Scalars['Int']>;
-  Status?: Maybe<Scalars['String']>;
+  Status: BeoordelingStatusEnum;
   Rapport?: Maybe<Scalars['String']>;
   RapportCijfer?: Maybe<Scalars['Int']>;
   DatumRapport?: Maybe<Scalars['Date']>;
   DatumGepland?: Maybe<Scalars['Date']>;
   Beoordelaar?: Maybe<Persoon>;
 };
+
+export enum BeoordelingStatusEnum {
+  Afgekeurd = 'Afgekeurd',
+  TerBeoordeling = 'TerBeoordeling',
+  Goedgekeurd = 'Goedgekeurd',
+  CommentaarGevraagd = 'CommentaarGevraagd'
+}
 
 export type Certificaat = {
   __typename?: 'Certificaat';
@@ -67,7 +74,7 @@ export type Certificering = {
   Opmerkingen: Scalars['String'];
   Nummer: Scalars['String'];
   NummerWeergave: Scalars['String'];
-  Status: Scalars['String'];
+  Status: CertificeringStatusEnum;
   /** Date on which all required sessions were taken */
   DatumVoldaan?: Maybe<Scalars['Date']>;
   IsVerlengingVan?: Maybe<Scalars['Int']>;
@@ -95,6 +102,15 @@ export type CertificeringAantekening = {
   PersoonIDAangemaakt?: Maybe<Scalars['Int']>;
   PersoonIDGewijzigd?: Maybe<Scalars['Int']>;
 };
+
+export enum CertificeringStatusEnum {
+  Geldig = 'Geldig',
+  Verlopen = 'Verlopen',
+  Ingetrokken = 'Ingetrokken',
+  TerGoedkeuring = 'TerGoedkeuring',
+  DiplomaAfgekeurd = 'DiplomaAfgekeurd',
+  Ingenomen = 'Ingenomen'
+}
 
 export type Comment = {
   __typename?: 'Comment';
@@ -160,6 +176,11 @@ export type CreateInvoiceCollectionResult = {
   invoiceCollectionId?: Maybe<Scalars['Int']>;
 };
 
+export enum CrediteurTypeEnum {
+  Universiteit = 'universiteit',
+  Persoon = 'persoon'
+}
+
 export type Cursus = {
   __typename?: 'Cursus';
   CursusID: Scalars['Int'];
@@ -171,7 +192,7 @@ export type Cursus = {
   IsBesloten?: Maybe<Scalars['Boolean']>;
   MaximumCursisten?: Maybe<Scalars['Int']>;
   Opmerkingen?: Maybe<Scalars['String']>;
-  Status?: Maybe<CursusStatusEnum>;
+  Status: CursusStatusEnum;
   CursusCode?: Maybe<Scalars['String']>;
   AocKenmerk?: Maybe<Scalars['String']>;
   ExamenCursusID?: Maybe<Scalars['Int']>;
@@ -191,7 +212,7 @@ export type CursusDeelname = {
   CursusDeelnameID: Scalars['Int'];
   CursusID: Scalars['Int'];
   PersoonID: Scalars['Int'];
-  Status: Scalars['String'];
+  Status: CursusDeelnameStatusEnum;
   Opmerkingen?: Maybe<Scalars['String']>;
   CertificeringID?: Maybe<Scalars['Int']>;
   DatumAangemaakt?: Maybe<Scalars['Date']>;
@@ -199,6 +220,22 @@ export type CursusDeelname = {
   Certificering?: Maybe<Certificering>;
   Persoon?: Maybe<Persoon>;
 };
+
+export enum CursusDeelnameStatusEnum {
+  Aangemeld = 'Aangemeld',
+  Aanwezig = 'Aanwezig',
+  Voorlopig = 'Voorlopig',
+  Betaald = 'Betaald',
+  Afgemeld = 'Afgemeld',
+  Geregistreerd = 'Geregistreerd',
+  Afgewezen = 'Afgewezen',
+  Geslaagd = 'Geslaagd',
+  Gezakt = 'Gezakt',
+  /** Geslaagd theorie, gezakt praktijk */
+  GeslaagdTheorieGezaktPraktijk = 'GeslaagdTheorie_GezaktPraktijk',
+  /** Gezakt theorie, geslaagd praktijk */
+  GeslaagdPraktijkGezaktTheorie = 'GeslaagdPraktijk_GezaktTheorie'
+}
 
 export type CursusNodes = {
   __typename?: 'CursusNodes';
@@ -230,6 +267,7 @@ export type CursusSessie = {
   Registered: Scalars['Boolean'];
   RegisteredDate?: Maybe<Scalars['Date']>;
   CanUnRegister: Scalars['Boolean'];
+  SpecialtyWebsite?: Maybe<Scalars['String']>;
 };
 
 export enum CursusStatusEnum {
@@ -369,6 +407,19 @@ export type GetInspectionPlanningInput = {
   targetSettings: TargetSettings;
   isInspector: Scalars['Boolean'];
   isRector: Scalars['Boolean'];
+};
+
+export type GetInspectionReportsInput = {
+  datumVisitatieVan: Scalars['Date'];
+  datumVisitatieTot: Scalars['Date'];
+  inspecteurId: Scalars['Int'];
+  rapportCijfer: Scalars['Int'];
+  competentieId: Scalars['Int'];
+  themaId: Scalars['Int'];
+  vakgroepId: Scalars['Int'];
+  vakId: Scalars['Int'];
+  volgensIntentieAanbod: Scalars['Int'];
+  examenInstellingId: Scalars['Int'];
 };
 
 export enum InkoopVerkoopEnum {
@@ -754,7 +805,7 @@ export type Pas = {
   DatumAanvraag: Scalars['Date'];
   DatumUitgeleverd?: Maybe<Scalars['Date']>;
   Aantal: Scalars['Int'];
-  Status: Scalars['String'];
+  Status: PasStatusEnum;
   BriefVerstuurd: Scalars['Boolean'];
   ContactgegevensID?: Maybe<Scalars['Int']>;
   Geadresseerde?: Maybe<Scalars['String']>;
@@ -771,6 +822,13 @@ export type PasRetour = {
   DatumAangemaakt: Scalars['Date'];
   AangemaaktDoor: Scalars['String'];
 };
+
+export enum PasStatusEnum {
+  Aangevraagd = 'Aangevraagd',
+  Betaald = 'Betaald',
+  Uitgeleverd = 'Uitgeleverd',
+  Error = 'Error'
+}
 
 export enum PaymentStatusEnum {
   All = 'ALL',
@@ -838,11 +896,42 @@ export type PlanningData = {
   VolgensIntentieAanbod?: Maybe<Scalars['Boolean']>;
 };
 
+export enum ProductConfiguratieCode {
+  Ad = 'AD',
+  Aekg = 'AEKG',
+  Aekt = 'AEKT',
+  Beec = 'BEEC',
+  Beke = 'BEKE',
+  Bevi = 'BEVI',
+  D1 = 'D1',
+  D2 = 'D2',
+  D3 = 'D3',
+  D4 = 'D4',
+  Detk = 'DETK',
+  Mgeg = 'MGEG',
+  Mgegi = 'MGEGI',
+  Mgek = 'MGEK',
+  Mgeki = 'MGEKI',
+  Mgem = 'MGEM',
+  Mgemi = 'MGEMI'
+}
+
 export enum ProductEnum {
   D1 = 'D1',
   D2 = 'D2',
   D3 = 'D3',
-  D4 = 'D4'
+  D4 = 'D4',
+  Ad = 'AD',
+  Agn = 'AGN',
+  Ak = 'AK',
+  Be = 'BE',
+  Bk = 'BK',
+  Bv = 'BV',
+  Dk = 'DK',
+  Ec = 'EC',
+  Ek = 'EK',
+  Et = 'ET',
+  Tb = 'TB'
 }
 
 export type Query = {
@@ -855,11 +944,13 @@ export type Query = {
   /** In the input, either specialtyId or courseId must be supplied */
   isLicenseValidForSpecialty: IsLicenseValidForSpecialtyResult;
   CursusSessies?: Maybe<Array<Maybe<CursusSessie>>>;
+  hasDuplicatePending: Scalars['Boolean'];
   ExamenInstellingen: Array<Maybe<ExamenInstelling>>;
   ExamDetails?: Maybe<Exam>;
   Exams?: Maybe<CursusNodes>;
   getInspectionPlanning?: Maybe<InspectionResult>;
   getInspectors?: Maybe<Array<Maybe<Inspector>>>;
+  getInspectionReports?: Maybe<Array<Maybe<Visitatie>>>;
   /**
    * Get unpaid invoices.
    * Optionally filter by status. And apply pagination with pageSize, pageNumber and orderBy (default: createdOn, DESC)
@@ -931,6 +1022,11 @@ export type QueryCursusSessiesArgs = {
 };
 
 
+export type QueryHasDuplicatePendingArgs = {
+  licenseId: Scalars['Int'];
+};
+
+
 export type QueryExamenInstellingenArgs = {
   isActive?: Maybe<Scalars['Boolean']>;
   findById?: Maybe<Scalars['Int']>;
@@ -949,6 +1045,11 @@ export type QueryExamsArgs = {
 
 export type QueryGetInspectionPlanningArgs = {
   input: GetInspectionPlanningInput;
+};
+
+
+export type QueryGetInspectionReportsArgs = {
+  input: GetInspectionReportsInput;
 };
 
 
@@ -1096,6 +1197,7 @@ export type SearchSpecialtyResult = {
   OrganizerPhone?: Maybe<Scalars['String']>;
   OrganizerWebsite?: Maybe<Scalars['String']>;
   PromoText?: Maybe<Scalars['String']>;
+  SpecialtyWebsite?: Maybe<Scalars['String']>;
 };
 
 export type Sessie = {
@@ -1148,14 +1250,20 @@ export type StatisticsPerSpecialty = {
 export type Studieresultaat = {
   __typename?: 'Studieresultaat';
   StudieresultaatID: Scalars['Int'];
-  Datum?: Maybe<Scalars['Date']>;
-  Status?: Maybe<Scalars['String']>;
+  Datum: Scalars['Date'];
+  Status: StudieresultaatStatusEnum;
   Certificering?: Maybe<Certificering>;
   Cursus: Cursus;
   Persoon: Persoon;
   Vak: Vak;
   NormVersie: NormVersie;
 };
+
+export enum StudieresultaatStatusEnum {
+  Voorlopig = 'Voorlopig',
+  Betaald = 'Betaald',
+  Definitief = 'Definitief'
+}
 
 export type TargetSettings = {
   specialtyTarget: Scalars['Float'];
@@ -1249,7 +1357,7 @@ export type Vak = {
   ThemaID?: Maybe<Scalars['Int']>;
   ThemaNaam?: Maybe<Scalars['String']>;
   Vakgroep?: Maybe<Vakgroep>;
-  Status?: Maybe<Scalars['String']>;
+  Status: VakStatusEnum;
   Website?: Maybe<Scalars['String']>;
   ExamenInstelling?: Maybe<ExamenInstelling>;
   BeoordelaarNaam?: Maybe<Scalars['String']>;
@@ -1264,6 +1372,16 @@ export type VakDiscussie = {
   title?: Maybe<Scalars['String']>;
   comments?: Maybe<Array<Maybe<Comment>>>;
 };
+
+export enum VakStatusEnum {
+  Afgekeurd = 'Afgekeurd',
+  Goedgekeurd = 'Goedgekeurd',
+  Ingediend = 'Ingediend',
+  Ingetrokken = 'Ingetrokken',
+  InOntwerp = 'InOntwerp',
+  Voorlopig = 'Voorlopig',
+  WordtBeoordeeld = 'WordtBeoordeeld'
+}
 
 export type Vakgroep = {
   __typename?: 'Vakgroep';
@@ -1418,6 +1536,23 @@ export type VooropleidingCategorie = {
   Naam: Scalars['String'];
 };
 
+export enum VrijstellingCertificaatStatusEnum {
+  Betaald = 'Betaald',
+  VoorlopigBetaald = 'VoorlopigBetaald'
+}
+
+export enum VrijstellingsVerzoekBetaalStatusEnum {
+  Betaald = 'Betaald'
+}
+
+export enum VrijstellingsVerzoekStatusEnum {
+  Geannuleerd = 'Geannuleerd',
+  Afgekeurd = 'Afgekeurd',
+  Aangevraagd = 'Aangevraagd',
+  Betaald = 'Betaald',
+  Goedgekeurd = 'Goedgekeurd'
+}
+
 export type AddVisitationCommentInput = {
   visitatieId: Scalars['Int'];
   commentaar: Scalars['SafeString'];
@@ -1532,7 +1667,7 @@ export type CreatePersonByPersonData = {
 export type DecoupleLicenseInput = {
   /** Current XX + KBA license which should be decoupled */
   licenseId: Scalars['Int'];
-  confirmationEmail?: Maybe<Scalars['Email']>;
+  confirmationEmail?: Maybe<Scalars['String']>;
 };
 
 export type DecoupleLicenseResult = {
