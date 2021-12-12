@@ -49,7 +49,6 @@ body .p-datatable .p-datatable-tbody button {
   top: 0;
   z-index: 100;
   background: #eee;
-  // box-shadow: 0px 2px 2px 0px #eee;
 }
 
 /* The slider itself */
@@ -58,7 +57,6 @@ body .p-datatable .p-datatable-tbody button {
   -webkit-appearance: none; /* Override default CSS styles */
   appearance: none;
   width: 100%; /* Full-width */
-  // height: 25px; /* Specified height */
   height: 15px;
   height: 35px;
   margin: 0px 0;
@@ -77,8 +75,6 @@ body .p-datatable .p-datatable-tbody button {
   border-color: #66afe9;
   outline: 0;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  // -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
-  // box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
 }
 
 /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */

@@ -85,54 +85,52 @@ const EditReport: React.FC<{
     ratingsTemplate = props.categories || getRatingsTemplate(props.visitatieId);
   }
 
-  const [
-    updateVisitationReport,
-    { loading: updateVisitationReportLoading },
-  ] = useUpdateVisitationReportMutation({
-    onCompleted() {
-      showGrowl({
-        severity: 'success',
-        summary: 'Rapport bijgewerkt',
-        detail: 'Het rapport is succesvol opgeslagen.',
-      });
-    },
-    onError(e) {
-      showGrowl({
-        severity: 'error',
-        summary: 'Rapport niet bijgewerkt',
-        sticky: true,
-        detail: `Er is een fout opgetreden bij het bijwerken van het rapport: ${e.message}`,
-      });
-    },
-    update(cache, result) {
-      const updateVisitationReport = result?.data?.updateVisitationReport;
-      if (!updateVisitationReport) {
-        return;
-      }
-      const visitationData = cache.readQuery<GetVisitationQuery>({
-        query: GetVisitationDocument,
-        variables: { input: { visitatieId: props.visitatieId } },
-      });
+  const [updateVisitationReport, { loading: updateVisitationReportLoading }] =
+    useUpdateVisitationReportMutation({
+      onCompleted() {
+        showGrowl({
+          severity: 'success',
+          summary: 'Rapport bijgewerkt',
+          detail: 'Het rapport is succesvol opgeslagen.',
+        });
+      },
+      onError(e) {
+        showGrowl({
+          severity: 'error',
+          summary: 'Rapport niet bijgewerkt',
+          sticky: true,
+          detail: `Er is een fout opgetreden bij het bijwerken van het rapport: ${e.message}`,
+        });
+      },
+      update(cache, result) {
+        const updateVisitationReport = result?.data?.updateVisitationReport;
+        if (!updateVisitationReport) {
+          return;
+        }
+        const visitationData = cache.readQuery<GetVisitationQuery>({
+          query: GetVisitationDocument,
+          variables: { input: { visitatieId: props.visitatieId } },
+        });
 
-      const currentVisitationData = visitationData?.Visitation;
+        const currentVisitationData = visitationData?.Visitation;
 
-      if (!currentVisitationData) {
-        return;
-      }
+        if (!currentVisitationData) {
+          return;
+        }
 
-      cache.writeQuery<GetVisitationQuery>({
-        query: GetVisitationDocument,
-        variables: { input: { visitatieId: props.visitatieId } },
-        data: {
-          Visitation: {
-            ...currentVisitationData,
-            ...updateVisitationReport,
-            __typename: 'Visitatie',
+        cache.writeQuery<GetVisitationQuery>({
+          query: GetVisitationDocument,
+          variables: { input: { visitatieId: props.visitatieId } },
+          data: {
+            Visitation: {
+              ...currentVisitationData,
+              ...updateVisitationReport,
+              __typename: 'Visitatie',
+            },
           },
-        },
-      });
-    },
-  });
+        });
+      },
+    });
 
   const yupTypes: any = {
     yupTextQuestion: yup.string().max(2000),
@@ -300,14 +298,14 @@ const EditReport: React.FC<{
                   <Button
                     disabled={!isValid && isDirty}
                     label={'Rapport opslaan'}
-                    buttonType="submit"
+                    type="submit"
                     icon="pi pi-check"
                     tooltip={`Een rapport kan meerdere worden aangepast voordat deze wordt ingediend.`}
                   />
                   <Button
                     disabled={!isValid}
                     label={'Rapport opslaan en indienen'}
-                    buttonType="button"
+                    type="button"
                     onClick={() => submitAndClose()}
                     icon="pi pi-check"
                     tooltip={`Een ingediend rapport kan niet meer worden aangepast.`}

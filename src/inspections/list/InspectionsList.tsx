@@ -20,7 +20,7 @@ import { toDutchDate } from '@erkenningen/ui/utils';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import add from 'date-fns/add';
 
-import styles from './InspectionsList.module.scss';
+import styles from './InspectionsList.module.css';
 import { isAfter } from 'date-fns';
 import { nrOfMonthsAfterWhichCommentsAreNotAllowed } from '../../utils/time';
 import { Row } from '@erkenningen/ui/layout/row';
@@ -29,6 +29,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Datepicker } from '@erkenningen/ui/components/datepicker';
 import { Select } from '@erkenningen/ui/components/select';
+import { DataTableSortOrderType } from 'primereact/datatable';
 
 type IPagination = {
   pageNumber: number;
@@ -38,7 +39,7 @@ type IPagination = {
 
 type ISort = {
   field: string;
-  direction: number;
+  direction: DataTableSortOrderType;
 };
 
 type IFilter = {
@@ -95,9 +96,9 @@ const InspectionsList: React.FC<unknown> = () => {
     if (parsed.field) {
       field = parsed.field as string;
     }
-    let direction = -1;
+    let direction: DataTableSortOrderType = -1;
     if (parsed.direction) {
-      direction = parsed.direction as number;
+      direction = parsed.direction as DataTableSortOrderType;
     }
 
     let courseCode = '';
@@ -360,7 +361,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       <Button
                         label={'Zoeken'}
                         disabled={!isValid}
-                        buttonType="submit"
+                        type="submit"
                         icon="fas fa-search"
                       />
                     </div>
@@ -395,7 +396,11 @@ const InspectionsList: React.FC<unknown> = () => {
           }}
           sortField={pagination.field}
           sortOrder={pagination.direction}
-          onSort={(e: { sortField: string; sortOrder: number; multiSortMeta: any }) => {
+          onSort={(e: {
+            sortField: string;
+            sortOrder: DataTableSortOrderType;
+            multiSortMeta: any;
+          }) => {
             setStateAndQueryParam({ ...pagination, field: e.sortField, direction: e.sortOrder });
           }}
           totalRecords={data?.Visitations?.totalCount}
@@ -412,7 +417,7 @@ const InspectionsList: React.FC<unknown> = () => {
                   onClick={() => history.push(`/details/${row.VisitatieID}/${row.SessieID}`)}
                   style={{ fontSize: '1.5rem' }}
                   tooltip="Bekijk details van deze inspectie"
-                  type={'info'}
+                  buttonType={'info'}
                   title={`${row.VisitatieID}`}
                 />
 
@@ -458,7 +463,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       icon="fas fa-receipt"
                       onClick={() => history.push(`/declaratie-indienen/${row.VisitatieID}`)}
                       tooltip="Declaratie indienen"
-                      type="secondary"
+                      buttonType="secondary"
                       style={{ fontSize: '1.5rem' }}
                     />
                   )}
@@ -469,7 +474,7 @@ const InspectionsList: React.FC<unknown> = () => {
                       label={''}
                       icon="fas fa-file-invoice"
                       onClick={() => history.push(`/factuur-bekijken/${row.VisitatieID}`)}
-                      type="info"
+                      buttonType="info"
                       tooltip="Factuur beschikbaar"
                       style={{ fontSize: '1.5rem' }}
                     />
@@ -618,31 +623,6 @@ const InspectionsList: React.FC<unknown> = () => {
               </>
             )}
           />
-          {/* <Column
-            field="Lokatie"
-            header={'Locatie'}
-            sortField={'Sessies:Lokatie:Naam'}
-            sortable={true}
-            body={(row: any) =>
-              `${row.Sessies[0]?.Lokatie?.Naam} | ${
-                row.Sessies[0]?.Lokatie?.Contactgegevens?.Woonplaats || ''
-              }`
-            }
-            style={{ minWidth: '180px' }}
-          />
-          <Column
-            field="AantalCursusDeelnames"
-            sortField={'AantalCursusDeelnames'}
-            sortable={true}
-            headerStyle={{ width: '6rem' }}
-            bodyClassName={styles.center}
-            header={
-              <>
-                <Tooltip target=".numParticipants" position={'top'} />
-                <i className={'fas fa-users numParticipants'} data-pr-tooltip="Aantal deelnemers" />
-              </>
-            }
-          /> */}
         </DataTable>
       </Panel>
     </div>
