@@ -141,7 +141,7 @@ const DiscussionDetails: React.FC<PropTypes> = (props) => {
                   label={'Commentaar opslaan'}
                   icon="pi pi-check"
                   disabled={!isValid}
-                  buttonType="submit"
+                  type="submit"
                   loading={addCommentLoading}
                 />
               </div>
@@ -157,7 +157,7 @@ const DiscussionDetails: React.FC<PropTypes> = (props) => {
             <Button
               className="hidden-print"
               label={orderDesc ? 'Sorteer oud naar nieuw' : 'Sorteer nieuw naar oud'}
-              buttonType="button"
+              type="button"
               icon={`pi ${orderDesc ? 'pi-sort-up' : 'pi-sort-down'}`}
               onClick={() => setOrderDesc(!orderDesc)}
               style={{ marginBottom: '15px' }}

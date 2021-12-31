@@ -3,6 +3,10 @@ schema: http://localhost:3010/graphql
 documents: './src/operation.graphql'
 generates:
   src/generated/graphql.tsx:
+    schema:
+      - http://localhost:3010/graphql:
+          headers:
+            Authorization: localtest
     plugins:
       - 'typescript'
       - 'typescript-operations'

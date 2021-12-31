@@ -9,7 +9,7 @@ import { ERKENNINGEN_GRAPHQL_API_URL } from '@erkenningen/config';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import './index.scss';
+import './index.css';
 
 const cache = new InMemoryCache({
   typePolicies: {

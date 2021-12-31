@@ -147,7 +147,6 @@ query getVisitationDeclarationInfo($input: visitationInput!) {
   }
 }
 
-
 query getSession($sessieId: Int!) {
   Sessie(sessieId: $sessieId) {
     ...SessionInfo
@@ -202,6 +201,7 @@ fragment SessionInfo on Sessie {
 mutation addVisitationComment($input: addVisitationCommentInput!) {
   addVisitationComment(input: $input) {
     DiscussieVisitatieID
+    Commentaar
     VisitatieID
     PersoonID
     DatumTijd

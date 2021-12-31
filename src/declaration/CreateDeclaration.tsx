@@ -89,28 +89,26 @@ const CreateDeclaration: React.FC<any> = () => {
     },
   });
 
-  const [
-    createDeclarationInvoice,
-    { loading: createDeclarationInvoiceLoading },
-  ] = useCreateDeclarationInvoiceMutation({
-    onCompleted(data) {
-      showGrowl({
-        severity: 'success',
-        summary: 'Factuur aangemaakt',
-        detail: 'De factuur is succesvol toegevoegd.',
-      });
+  const [createDeclarationInvoice, { loading: createDeclarationInvoiceLoading }] =
+    useCreateDeclarationInvoiceMutation({
+      onCompleted(data) {
+        showGrowl({
+          severity: 'success',
+          summary: 'Factuur aangemaakt',
+          detail: 'De factuur is succesvol toegevoegd.',
+        });
 
-      setInvoiceCreated(data);
-    },
-    onError(e) {
-      showGrowl({
-        severity: 'error',
-        summary: 'Factuur niet aangemaakt',
-        sticky: true,
-        detail: `Er is een fout opgetreden bij het aanmaken van de factuur: ${e.message}`,
-      });
-    },
-  });
+        setInvoiceCreated(data);
+      },
+      onError(e) {
+        showGrowl({
+          severity: 'error',
+          summary: 'Factuur niet aangemaakt',
+          sticky: true,
+          detail: `Er is een fout opgetreden bij het aanmaken van de factuur: ${e.message}`,
+        });
+      },
+    });
 
   if (loading) {
     return (
@@ -279,7 +277,7 @@ const CreateDeclaration: React.FC<any> = () => {
                 <Button
                   disabled={!isValid}
                   label={'Declaratie indienen'}
-                  buttonType="submit"
+                  type="submit"
                   icon="pi pi-check"
                   tooltip={`Dien de declaratie in, hierna wordt de factuur getoond.`}
                 />

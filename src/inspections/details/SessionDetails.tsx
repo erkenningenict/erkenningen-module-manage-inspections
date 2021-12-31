@@ -9,7 +9,7 @@ import { FormStaticItem } from '../../components/FormStaticItem';
 import { Button } from '@erkenningen/ui/components/button';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import { useParams } from 'react-router-dom';
-import './SessionDetails.scss';
+import './SessionDetails.css';
 
 const SessionDetails: React.FC = () => {
   const { showGrowl } = useGrowlContext();
@@ -120,7 +120,7 @@ const SessionDetails: React.FC = () => {
         <FormStaticItem label="">
           <Button
             label={showAll ? 'Toon minder' : 'Toon alles'}
-            buttonType="button"
+            type="button"
             onClick={() => setShowAll(!showAll)}
           ></Button>
         </FormStaticItem>
