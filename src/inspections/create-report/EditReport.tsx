@@ -300,7 +300,7 @@ const EditReport: React.FC<{
                     label={'Rapport opslaan'}
                     type="submit"
                     icon="pi pi-check"
-                    tooltip={`Een rapport kan meerdere worden aangepast voordat deze wordt ingediend.`}
+                    tooltip={`Een rapport kan meerdere keren worden aangepast voordat deze wordt ingediend.`}
                   />
                   <Button
                     disabled={!isValid}
